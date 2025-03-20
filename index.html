@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Card Game</title>
+    <link rel="icon" href="image/MY LOGO.png"/>
+    <link rel="stylesheet" href="memory/style.css">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3758016323496227"
+     crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding-top: 1rem;
+            background: linear-gradient(135deg, #dbdcdd, #b7c4d8);
+        }
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            margin-bottom: 30px;
+            font-size: 24px;
+            color: #333;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .button {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            width: calc(50% - 30px); /* Adjusted to fit two buttons per line */
+            height: 100px; /* Ensure the buttons have a fixed height */
+            overflow: hidden;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for better readability */
+        }
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(2px);
+            z-index: 0;
+        }
+        .button span {
+            position: relative;
+            z-index: 1;
+            font-size: 24px; /* Increase font size */
+            text-transform: uppercase; /* Make text uppercase */
+            letter-spacing: 1px; /* Add letter spacing */
+        }
+        .button:hover::before {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .button.hint {
+            background-color: #ff9800; /* Orange color */
+            color: white;
+        }
+        .button.hint:hover {
+            background-color: #e68900; /* Darker orange on hover */
+        }
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+        }
+        footer a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            .button {
+                width: 100%; /* Full width for smaller screens */
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Memory Card Game</h1>
+        <label for="level-select">Select Level:</label>
+        <select id="level-select">
+            <option value="4">4x4</option>
+            <option value="8">6x5</option>
+        </select>
+        <div id="game-board"></div>
+        <div id="tries">Tries: 0</div>
+        <button id="reset-button" class="button">Reset Game</button>
+        <button id="hint-button" class="button hint">Get a Hint</button>
+
+        <script src="memory/script.js"></script>
+    </div>
+</body>
+</html>
