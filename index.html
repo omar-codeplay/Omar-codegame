@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Card Game</title>
     <link rel="icon" href="image/MY LOGO.png"/>
-    <link rel="stylesheet" href="memory/style.css">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3758016323496227"
      crossorigin="anonymous"></script>
+    <title>Game Selection</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -82,12 +81,29 @@
         .button:hover::before {
             background-color: rgba(0, 0, 0, 0.5);
         }
-        .button.hint {
-            background-color: #ff9800; /* Orange color */
-            color: white;
+        .button.xo::before {
+            background-image: url('image/X_O.png');
         }
-        .button.hint:hover {
-            background-color: #e68900; /* Darker orange on hover */
+        .button.chess::before {
+            background-image: url('image/Chess.png');
+        }
+        .button.connect4::before {
+            background-image: url('image/connect.png');
+        }
+        .button.memory::before {
+            background-image: url('image/memory.png');
+        }
+        .button.pong::before {
+            background-image: url('image/Pong.png');
+        }
+        .button.cubes::before {
+            background-image: url('image/Rcube.png');
+        }
+        .button.crossroad::before {
+            background-image: url('image/crossroad.png');
+        }
+        .button.coloriq::before {
+            background-image: url('image/IQ.png');
         }
         footer {
             margin-top: 20px;
@@ -111,18 +127,21 @@
 </head>
 <body>
     <div class="container">
-        <h1>Memory Card Game</h1>
-        <label for="level-select">Select Level:</label>
-        <select id="level-select">
-            <option value="4">4x4</option>
-            <option value="8">6x5</option>
-        </select>
-        <div id="game-board"></div>
-        <div id="tries">Tries: 0</div>
-        <button id="reset-button" class="button">Reset Game</button>
-        <button id="hint-button" class="button hint">Get a Hint</button>
-
-        <script src="memory/script.js"></script>
+        <h1>Select a Game</h1>
+        <div class="button-container">
+            <a href="Tic Tac Toe.html" class="button xo"><span>X/O</span></a>
+            <a href="Chess.html" class="button chess"><span>Chess</span></a>
+            <a href="connect4.html" class="button connect4"><span>Connect 4</span></a>
+            <a href="memory.html" class="button memory"><span>Memory</span></a>
+            <a href="pong.html" class="button pong"><span>Pong</span></a>
+            <a href="cube.html" class="button cubes"><span>Cubes</span></a>
+            <a href="crossroad.html" class="button crossroad"><span>Crossroad</span></a>
+            <a href="coloriq.html" class="button coloriq"><span>IQ Test</span></a>
+        </div>
     </div>
+    <footer>
+        <p>Check out my other website: <a href="https://omar-codeplay.netlify.app/" target="_blank">omar-codeplay.netlify.app</a></p>
+        <p>&copy; 2025 Omar CodePlay</p>
+    </footer>
 </body>
 </html>
