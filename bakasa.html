@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بكاسه</title>
+    <link rel="stylesheet" href="bakasa/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🕵️ بكاسه 🕵️</h1>
+        <p>لعبة الجاسوس - The Spy Game</p>
+
+        <!-- Screen 1: Player Names Entry -->
+        <div id="names-screen" class="screen active">
+            <div class="names-content">
+                <h2>أدخل أسماء اللاعبين</h2>
+                <p>Enter Player Names</p>
+                <div id="players-list" class="players-list"></div>
+                <div class="input-section">
+                    <input type="text" id="player-name-input" placeholder="اسم اللاعب - Player Name">
+                    <button id="add-player-btn" class="btn-medium">إضافة - Add</button>
+                </div>
+                <button id="names-done-btn" class="btn-large" disabled>التالي - Next</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: Game Setup (Category & Spies) -->
+        <div id="setup-screen" class="screen">
+            <div class="setup-content">
+                <h2>إعدادات اللعبة</h2>
+                
+                <div class="setup-section">
+                    <label>الفئة (Category):</label>
+                    <div class="category-buttons">
+                        <button class="category-btn" data-category="food">🍕 أكل - Food</button>
+                        <button class="category-btn" data-category="animals">🦁 حيوانات - Animals</button>
+                    </div>
+                </div>
+
+                <div class="setup-section">
+                    <label for="impostors-count">عدد الجواسيس (Number of Imposters):</label>
+                    <div class="number-control">
+                        <button id="impostors-minus" class="btn-small">−</button>
+                        <input type="number" id="impostors-count" value="1" min="1" max="5">
+                        <button id="impostors-plus" class="btn-small">+</button>
+                    </div>
+                </div>
+
+                <button id="game-start-btn" class="btn-large">ابدأ اللعبة - Start Game</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: Card Reveal (Private View) -->
+        <div id="card-reveal-screen" class="screen">
+            <div class="card-reveal-content">
+                <h2 id="card-label"></h2>
+                <p id="player-turn-text"></p>
+                <div id="card-display" class="card-display">
+                    <div class="card">
+                        <div class="card-inner" id="card-inner">
+                            <div class="card-front">
+                                <p>اقلب الهاتف</p>
+                                <!-- removed English line -->
+                            </div>
+                            <div class="card-back" id="card-content">
+                                <div id="role-display"></div>
+                                <div id="word-display"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="card-reveal-btn" class="btn-large">اقلب - Reveal Card</button>
+                <button id="card-next-btn" class="btn-large hidden">التالي - Next Player</button>
+            </div>
+        </div>
+
+        <!-- Screen 4: Discussion Phase -->
+        <div id="discussion-screen" class="screen">
+            <div class="discussion-content">
+                <h2>جولة النقاش</h2>
+                <p>Discussion Phase - اسأل بعضكم على بعض</p>
+                <div class="discussion-info">
+                    <p class="round-info" id="round-text"></p>
+                </div>
+                <div class="speech-bubble-area" id="speech-bubbles"></div>
+                <button id="ready-to-vote-btn" class="btn-large">جاهز للتصويت - Ready to Vote</button>
+            </div>
+        </div>
+
+        <!-- Screen 5: Voting Phase -->
+        <div id="voting-screen" class="screen">
+            <div class="voting-content">
+                <h2>من هو الجاسوس؟</h2>
+                <p id="current-voter-text"></p>
+                <div class="voting-options" id="voting-options"></div>
+                <button id="voting-next-btn" class="btn-large hidden">التالي - Next Voter</button>
+                <button id="voting-end-btn" class="btn-large hidden">انهاء التصويت - End Voting</button>
+            </div>
+        </div>
+
+        <!-- Screen 6: Impostor Guessing -->
+        <div id="guess-screen" class="screen">
+            <div class="guess-content">
+                <h2 id="guess-title"></h2>
+                <p>خمّن من 4 خيارات</p>
+                <div class="guess-options" id="guess-options"></div>
+            </div>
+        </div>
+
+        <!-- Screen 7: Results -->
+        <div id="results-screen" class="screen">
+            <div class="results-content">
+                <h2 id="game-result-title"></h2>
+                <div class="results-details" id="results-details"></div>
+                <button id="play-again-btn" class="btn-large">لعبة جديدة - Play Again</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="bakasa/script.js"></script>
+</body>
+</html>

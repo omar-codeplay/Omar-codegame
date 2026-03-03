@@ -1,64 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="image/logo-nobg.png"/>
+    <link rel="icon" href="image/logo-nobg.png" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3758016323496227"
-     crossorigin="anonymous"></script>
-    <title>Home</title>
+        crossorigin="anonymous"></script>
+    <title>Home - Games Collection</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin: 0;
-            padding-top: 1rem;
-            background: linear-gradient(135deg, #dbdcdd, #b7c4d8);
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #00b2ff 0%, #0011ff 100%);
         }
+
         .container {
             text-align: center;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
             width: 100%;
+            backdrop-filter: blur(5px);
         }
+
         h1 {
             margin-bottom: 30px;
-            font-size: 24px;
+            font-size: 2.5rem;
             color: #333;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
+
         .button-container {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            gap: 20px;
         }
+
         .button {
             position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 15px;
-            padding: 15px;
-            font-size: 20px;
+            width: calc(50% - 20px);
+            height: 180px;
+            font-size: 1.8rem;
             font-weight: bold;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 20px;
             cursor: pointer;
             text-decoration: none;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             background-size: cover;
             background-position: center;
-            width: calc(50% - 30px); /* Adjusted to fit two buttons per line */
-            height: 100px; /* Ensure the buttons have a fixed height */
             overflow: hidden;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Add text shadow for better readability */
+            text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background-color: #005eff; /* fallback color */
         }
+
+        /* Frosted glass overlay with blur */
         .button::before {
             content: '';
             position: absolute;
@@ -66,65 +84,114 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-size: cover;
-            background-position: center;
-            filter: blur(2px);
-            z-index: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(1.5px);
+            -webkit-backdrop-filter: blur(3px);
+            transition: all 0.3s ease;
+            z-index: 1;
         }
+
+        .button:hover::before {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
         .button span {
             position: relative;
-            z-index: 1;
-            font-size: 24px; /* Increase font size */
-            text-transform: uppercase; /* Make text uppercase */
-            letter-spacing: 1px; /* Add letter spacing */
+            z-index: 2;
+            font-size: inherit;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
-        .button:hover::before {
-            background-color: rgba(0, 0, 0, 0.5);
+
+        .button:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
         }
-        .button.xo::before {
+
+        /* Background images for each game */
+        .button.xo {
             background-image: url('image/X_O.png');
         }
-        .button.chess::before {
-            background-image: url('image/Chess.png');
+
+        .button.chess {
+            background-image: url('image/chess.png'); /* New chess thumbnail */
         }
-        .button.connect4::before {
-            background-image: url('image/connect.png');
+
+        .button.connect4 {
+            background-image: url('image/connect4.png');
         }
-        .button.memory::before {
-            background-image: url('image/memory.png');
+
+        .button.memory {
+            background-image: url('image/cards.png');
         }
-        .button.cubes::before {
+
+        .button.cubes {
             background-image: url('image/Rcube.png');
         }
-        .button.crossroad::before {
+
+        .button.crossroad {
             background-image: url('image/crossroad.png');
         }
-        .button.coloriq::before {
-            background-image: url('image/IQ.png');
+
+        .button.coloriq {
+            background-image: url('image/colors.png');
         }
+
+        .button.bakasa {
+            background-image: url('image/bakasa.png');
+        }
+
+        .button.fortress {
+            background-image: url('image/fortress.png');
+        }
+
         footer {
-            margin-top: 20px;
+            margin-top: 30px;
             text-align: center;
-            color: #666;
+            color: white;
+            font-size: 1rem;
         }
+
         footer a {
-            color: #007BFF;
+            color: #ffd700;
             text-decoration: none;
+            font-weight: bold;
         }
+
         footer a:hover {
             text-decoration: underline;
         }
-        @media (max-width: 600px) {
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
             .button {
-                width: 100%; /* Full width for smaller screens */
-                margin: 15px 0;
+                width: 100%;
+                height: 120px;
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .button {
+                height: 100px;
+                font-size: 1.2rem;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>Select a Game</h1>
+        <h1>🎮 اختر لعبتك المفضلة</h1>
         <div class="button-container">
             <a href="Tic Tac Toe.html" class="button xo"><span>X/O</span></a>
             <a href="Chess.html" class="button chess"><span>Chess</span></a>
@@ -133,11 +200,15 @@
             <a href="cube.html" class="button cubes"><span>Cubes</span></a>
             <a href="crossroad.html" class="button crossroad"><span>Crossroad</span></a>
             <a href="coloriq.html" class="button coloriq"><span>IQ Test</span></a>
+            <a href="bakasa.html" class="button bakasa"><span>بكاسه</span></a>
+            <a href="fortress.html" class="button fortress"><span>Fortress</span></a>
         </div>
     </div>
     <footer>
-        <p>Check out my other website: <a href="https://omar-codeplay.netlify.app/" target="_blank">omar-codeplay.netlify.app</a></p>
-        <p>&copy; 2025 Omar CodePlay</p>
+        <p>📌 موقعي الآخر: <a href="https://omar-codeplay.netlify.app/" target="_blank">omar-codeplay.netlify.app</a>
+        </p>
+        <p>&copy; 2026 Omar CodePlay</p>
     </footer>
 </body>
+
 </html>

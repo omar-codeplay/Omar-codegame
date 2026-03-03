@@ -11,7 +11,11 @@ const gameBoard = document.getElementById('game-board');
 const statusDiv = document.getElementById('status');
 const resetButton = document.getElementById('reset-button');
 
+// audio context for generating simple tones
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
 resetButton.addEventListener('click', resetGame);
+
 
 function initBoard() {
     board = [];
@@ -23,6 +27,8 @@ function initBoard() {
     }
     renderBoard();
 }
+
+let lastMove = null; // remember the last dropped disc location
 
 function renderBoard() {
     gameBoard.innerHTML = '';
@@ -39,11 +45,22 @@ function renderBoard() {
             } else if (board[row][col] === PLAYER2) {
                 cellDiv.dataset.player = PLAYER2;
             }
+
+            // add drop animation class if this is the last move
+            if (lastMove && lastMove.row == row && lastMove.col == col) {
+                cellDiv.classList.add('drop');
+            }
+
             cellDiv.addEventListener('click', handleCellClick);
+            // highlight column on hover
+            cellDiv.addEventListener('mouseover', () => highlightColumn(col));
+            cellDiv.addEventListener('mouseout', () => clearColumn(col));
             rowDiv.appendChild(cellDiv);
         }
         gameBoard.appendChild(rowDiv);
     }
+    // clear lastMove so animation only plays once
+    lastMove = null;
     updateStatus();
 }
 
@@ -53,6 +70,7 @@ function handleCellClick(event) {
         if (checkWin()) {
             statusDiv.textContent = `Player ${currentPlayer} wins!`;
             disableBoard();
+            playWin();
         } else {
             switchPlayer();
             updateStatus();
@@ -64,7 +82,9 @@ function dropDisc(col) {
     for (let row = ROWS - 1; row >= 0; row--) {
         if (board[row][col] === EMPTY) {
             board[row][col] = currentPlayer;
+            lastMove = { row, col };
             renderBoard();
+            playDrop();
             return true;
         }
     }
@@ -103,18 +123,64 @@ function switchPlayer() {
     currentPlayer = (currentPlayer === PLAYER1) ? PLAYER2 : PLAYER1;
 }
 
+// -----------------------------------------------------------------------------
+// sound helpers using Web Audio API
+// -----------------------------------------------------------------------------
+function playTone(frequency, duration = 0.1, type = 'sine') {
+    const oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    oscillator.type = type;
+    oscillator.frequency.value = frequency;
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + duration);
+}
+
+function playDrop() {
+    playTone(440, 0.05, 'square');
+}
+
+function playWin() {
+    // simple celebratory arpeggio
+    playTone(523.25, 0.15, 'triangle');
+    setTimeout(() => playTone(659.25, 0.15, 'triangle'), 150);
+    setTimeout(() => playTone(783.99, 0.15, 'triangle'), 300);
+}
+
+function playReset() {
+    playTone(261.63, 0.1, 'sawtooth');
+}
+
+
 function updateStatus() {
     statusDiv.textContent = `Player ${currentPlayer}'s turn`;
 }
 
 function disableBoard() {
+    // remove click listeners on individual cells
     const cells = document.querySelectorAll('.cell');
     cells.forEach(cell => cell.removeEventListener('click', handleCellClick));
+    // prevent further hovering or clicking
+    gameBoard.style.pointerEvents = 'none';
 }
 
 function resetGame() {
     currentPlayer = PLAYER1;
     initBoard();
+    playReset();
+}
+
+// highlight helpers
+function highlightColumn(col) {
+    const cells = document.querySelectorAll(`.cell[data-col="${col}"]`);
+    cells.forEach(c => c.classList.add('hover'));
+}
+
+function clearColumn(col) {
+    const cells = document.querySelectorAll(`.cell[data-col="${col}"]`);
+    cells.forEach(c => c.classList.remove('hover'));
 }
 
 initBoard();

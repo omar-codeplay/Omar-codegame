@@ -1,0 +1,139 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e2b3a 0%, #2c3e50 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    direction: rtl;
+}
+
+.container {
+    background: #ecf0f1;
+    border-radius: 30px;
+    padding: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    width: 100%;
+    text-align: center;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+p {
+    color: #34495e;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+}
+
+.game-info {
+    background: #bdc3c7;
+    padding: 15px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.turn-indicator {
+    color: white;
+    text-shadow: 1px 1px 2px black;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    background: #34495e;
+    padding: 10px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    aspect-ratio: 1 / 1;
+}
+
+.cell {
+    background: #95a5a6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    aspect-ratio: 1 / 1;
+    transition: background 0.2s, transform 0.1s;
+    font-size: 2em;
+}
+
+.cell:hover {
+    background: #7f8c8d;
+    transform: scale(1.05);
+}
+
+.cell.wall {
+    background: #2c3e50;
+    cursor: not-allowed;
+}
+
+.cell.wall::after {
+    content: "🧱";
+    font-size: 1.5em;
+    opacity: 0.7;
+}
+
+.cell.red-king {
+    background: #e74c3c;
+    box-shadow: 0 0 15px #e74c3c;
+}
+
+.cell.blue-king {
+    background: #3498db;
+    box-shadow: 0 0 15px #3498db;
+}
+
+.cell.red-king::after {
+    content: "👑";
+    color: white;
+    text-shadow: 2px 2px 4px black;
+}
+
+.cell.blue-king::after {
+    content: "👑";
+    color: white;
+    text-shadow: 2px 2px 4px black;
+}
+
+.btn-large {
+    padding: 15px 30px;
+    border: none;
+    background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+    color: white;
+    border-radius: 50px;
+    font-size: 1.2em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+    margin-top: 10px;
+    border: none;
+}
+
+.btn-large:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(230, 126, 34, 0.6);
+}
+
+@media (max-width: 500px) {
+    .cell {
+        font-size: 1.5em;
+    }
+}

@@ -4,6 +4,50 @@ let userPattern = [];
 let level = 0;
 let clickCount = 0;
 let gameStarted = false;
+let missedColor = null; // track color when user makes a mistake
+
+// audio context for richer tones
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const frequencies = {
+  green: 329.63, // E note
+  red: 261.63,   // C note
+  yellow: 392.0, // G note
+  blue: 493.88   // B note
+};
+
+function playTone(freq, duration = 0.2, type = 'sine') {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  // quick attack/decay envelope
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.01);
+  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration + 0.05);
+}
+
+function playSuccess() {
+  // simple upward arpeggio
+  const notes = [frequencies.green, frequencies.yellow, frequencies.blue];
+  notes.forEach((f, i) => {
+    setTimeout(() => playTone(f, 0.15, 'triangle'), i * 150);
+  });
+}
+
+function playError() {
+  playTone(150, 0.4, 'square');
+}
+
+function playClick(color) {
+  playTone(frequencies[color], 0.1, 'sawtooth');
+}
 
 document.getElementById("start-btn").addEventListener("click", startGame);
 
@@ -17,6 +61,7 @@ function startGame() {
     document.getElementById("status").textContent = `Level ${level}`;
     document.getElementById("click-count").textContent = clickCount;
 
+    playTone(523.25, 0.2, 'triangle'); // start sound
     showMyTexts();
     nextSequence();
   }
@@ -54,6 +99,7 @@ function animateSequence() {
 function flashButton(color) {
   const button = document.getElementById(color);
   button.classList.add("active");
+  playClick(color);
   setTimeout(() => {
     button.classList.remove("active");
   }, 300);
@@ -111,7 +157,12 @@ function checkAnswer(currentLevel) {
     }
   } else {
     document.getElementById("status").textContent = `Game Over!`;
-
+    missedColor = gamePattern[currentLevel];
+    playError();
+    // shake the container to emphasize mistake
+    const container = document.getElementById('game-container');
+    container.classList.add('shake');
+    setTimeout(() => container.classList.remove('shake'), 400);
     setTimeout(() => {
       flashButton(missedColor);
     }, 1000);
@@ -141,10 +192,12 @@ function showCongratsMessage() {
   const message = `Congrats! You passed level ${level}!`;
   const congratsMessageElement = document.getElementById("level-message");
   congratsMessageElement.textContent = message;
+  congratsMessageElement.style.color = "green";
   congratsMessageElement.style.display = "block"; // Ensure it's displayed
   setTimeout(() => {
     congratsMessageElement.classList.add("show"); // Show the message with animation
   }, 50); // Small delay to trigger the animation
+  playSuccess();
 }
 
 function hideCongratsMessage() {
@@ -167,6 +220,7 @@ function showLoseMessage() {
   setTimeout(() => {
     loseMessageElement.classList.add("show"); // Show the message with animation
   }, 50); // Small delay to trigger the animation
+  playError();
 }
 
 function hideLoseMessage() {
