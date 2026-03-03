@@ -11,7 +11,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding: 20px;
+    padding: 10px; /* تقليل padding حول الجسم */
     direction: rtl;
 }
 
@@ -100,12 +100,7 @@ p {
     box-shadow: 0 0 15px #3498db;
 }
 
-.cell.red-king::after {
-    content: "👑";
-    color: white;
-    text-shadow: 2px 2px 4px black;
-}
-
+.cell.red-king::after,
 .cell.blue-king::after {
     content: "👑";
     color: white;
@@ -124,7 +119,6 @@ p {
     transition: transform 0.2s, box-shadow 0.2s;
     width: 100%;
     margin-top: 10px;
-    border: none;
 }
 
 .btn-large:hover {
@@ -132,8 +126,65 @@ p {
     box-shadow: 0 10px 25px rgba(230, 126, 34, 0.6);
 }
 
+/* تحسينات للشاشات الصغيرة */
 @media (max-width: 500px) {
+    .container {
+        padding: 15px; /* تقليل الحواف الداخلية */
+    }
+
+    h1 {
+        font-size: 2em; /* تصغير العنوان */
+    }
+
+    p {
+        font-size: 1em;
+    }
+
+    .game-info {
+        font-size: 1.1em;
+        padding: 10px;
+    }
+
+    .board {
+        gap: 3px; /* تقليل الفجوات بين الخلايا */
+        padding: 8px;
+    }
+
     .cell {
-        font-size: 1.5em;
+        font-size: 1.5em; /* تصغير الرموز */
+    }
+
+    .btn-large {
+        font-size: 1em;
+        padding: 12px 20px;
+    }
+}
+
+@media (max-width: 380px) {
+    .container {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .board {
+        gap: 2px;
+        padding: 5px;
+    }
+
+    .cell {
+        font-size: 1.2em;
+    }
+
+    .game-info {
+        font-size: 1em;
+        padding: 8px;
+    }
+
+    .btn-large {
+        font-size: 0.9em;
+        padding: 10px 15px;
     }
 }

@@ -1,19 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
     <link rel="stylesheet" href="chess/Chess.css">
-    <link rel="icon" href="image/logo-nobg.png"/>
-    <script async src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
     <script defer src="chess/Chess.js"></script>
 </head>
+
 <body>
     <div class="container">
         <h1>Chess Game</h1>
-        <p>Click a piece to select it. Highlighted squares show legal moves. Click to move.</p>
-        
+        <p>Drag or click pieces to move. White at bottom.</p>
+
         <div class="game-info">
             <div id="turn" class="turn-display">White's Turn</div>
             <div id="game-status" class="status-display"></div>
@@ -23,8 +27,6 @@
 
         <div class="actions">
             <button id="reset-btn" class="btn">New Game</button>
-            <button id="prev-move-btn" class="btn">← Prev Move</button>
-            <button id="next-move-btn" class="btn">Next Move →</button>
             <button id="undo-btn" class="btn">Undo Move</button>
             <button id="load-fen-btn" class="btn">Load FEN</button>
             <button id="export-pgn-btn" class="btn">Export PGN</button>
@@ -32,34 +34,30 @@
             <button id="lib-btn" class="btn">Game Library</button>
         </div>
 
-        <!-- FEN Modal -->
+        <div class="theme-selector">
+            <label for="board-theme">Theme:</label>
+            <select id="board-theme" class="btn">
+                <option value="classic">Classic Wood</option>
+                <option value="green" selected>Chess.com Green</option>
+                <option value="ocean">Ocean Blue</option>
+            </select>
+        </div>
+
         <div id="fen-modal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Load FEN Position</h2>
-                <p>Paste a valid FEN string to load a custom position:</p>
-                <textarea id="fen-input" placeholder="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" rows="4"></textarea>
-                <button id="confirm-fen-btn" class="btn">Load Position</button>
+            <div class="modal-content"><span class="close">&times;</span>
+                <h2>FEN</h2><textarea id="fen-input" rows="4"></textarea><button id="confirm-fen-btn"
+                    class="btn">Load</button>
             </div>
         </div>
-
-        <!-- Game Library Modal -->
         <div id="library-modal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Game Library</h2>
-                <div id="library-list" class="library-list"></div>
-                <button id="clear-lib-btn" class="btn btn-danger">Clear All Games</button>
+            <div class="modal-content"><span class="close">&times;</span>
+                <h2>Library</h2>
+                <div id="library-list"></div>
             </div>
         </div>
-
-        <!-- Save Game Modal -->
         <div id="save-modal" class="modal">
-            <div class="modal-content">
-                <span class="close">&times;</span>
-                <h2>Save Game</h2>
-                <input type="text" id="game-name" placeholder="Enter game name (e.g., Game vs Friend)" maxlength="50">
-                <button id="confirm-save-btn" class="btn">Save</button>
+            <div class="modal-content"><span class="close">&times;</span>
+                <h2>Save</h2><input type="text" id="game-name"><button id="confirm-save-btn" class="btn">Save</button>
             </div>
         </div>
 
@@ -70,4 +68,5 @@
         </div>
     </div>
 </body>
+
 </html>

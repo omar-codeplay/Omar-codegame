@@ -79,7 +79,7 @@ function createBoard() {
     cards = generateCards(level);
     shuffle(cards);
     gameBoard.innerHTML = '';
-    gameBoard.style.gridTemplateColumns = `repeat(${level === 8 ? 6 : level}, 100px)`;
+    gameBoard.style.gridTemplateColumns = `repeat(${level === 8 ? 6 : level}, 1fr)`;
     cards.forEach((card, index) => {
         const cardElement = document.createElement('div');
         cardElement.classList.add('card');

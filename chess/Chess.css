@@ -18,8 +18,8 @@ body {
     background: white;
     border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    max-width: 900px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 1000px;
     width: 100%;
 }
 
@@ -66,92 +66,68 @@ p {
     min-width: 150px;
 }
 
-.board {
-    display: grid;
-    grid-template-columns: repeat(8, 60px);
-    grid-template-rows: repeat(8, 60px);
-    margin: 30px auto;
-    border: 3px solid #333;
-    box-shadow: 0 0 20px rgba(0,0,0,0.3);
-    user-select: none;
-    cursor: default;
-    width: 480px;
-    height: 480px;
-}
-
-.square {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5em;
-    cursor: pointer;
-    position: relative;
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-.square.light {
-    background-color: #e8d5b7;
-}
-
-.square.dark {
-    background-color: #b58863;
-}
-
-.square.selected {
-    background-color: #baca44 !important;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-}
-
-.square.dragging {
-    background-color: #8ab4f8 !important;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
-}
-
-.square.legal-move {
-    background-color: rgba(186, 202, 68, 0.5) !important;
-}
-
-.square.last-move {
-    background-color: rgba(255, 255, 0, 0.3) !important;
-}
-
-.square.check {
-    background-color: #ff4444 !important;
-    animation: pulse 0.6s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { box-shadow: inset 0 0 10px rgba(255,0,0,0.3); }
-    50% { box-shadow: inset 0 0 20px rgba(255,0,0,0.6); }
-}
-
-.piece {
-    cursor: grab;
-    user-select: none;
-    transition: transform 0.1s;
+/* Responsive chessboard container */
+#board {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 4px;
-    pointer-events: none;
+    max-width: 500px;
+    /* Adjust as needed */
+    margin: 0 auto 20px;
+    border: 3px solid #333;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 }
 
-.piece:hover {
-    transform: scale(1.1);
+/* Ensure the board itself scales */
+.board {
+    width: 100% !important;
+    height: auto !important;
 }
 
-.piece:active {
-    cursor: grabbing;
+/* Make squares scale proportionally */
+.board .square {
+    background-size: cover;
 }
 
+/* Actions buttons */
 .actions {
     display: flex;
     justify-content: center;
     gap: 10px;
     margin: 30px 0;
     flex-wrap: wrap;
+}
+
+/* Theme Selector Styling */
+.theme-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 1. CHESS.COM GREEN (Default) */
+.theme-green .white-1e1d7 { background-color: #eeeed2 !important; color: #769656; }
+.theme-green .black-3c85d { background-color: #769656 !important; color: #eeeed2; }
+
+/* 2. CLASSIC WOOD */
+.theme-classic .white-1e1d7 { background-color: #edd6af !important; color: #b88761; }
+.theme-classic .black-3c85d { background-color: #b88761 !important; color: #edd6af; }
+
+/* 3. OCEAN BLUE */
+.theme-ocean .white-1e1d7 { background-color: #dee3e6 !important; color: #8ca2ad; }
+.theme-ocean .black-3c85d { background-color: #8ca2ad !important; color: #dee3e6; }
+
+/* Selection and Move Highlighting */
+/* We use semi-transparent yellow so it looks good on any color board */
+.selected {
+    box-shadow: inset 0 0 3px 3px rgba(255, 255, 0, 0.8) !important;
+    background-color: rgba(255, 255, 0, 0.4) !important;
+}
+
+.last-move {
+    background-color: rgba(245, 246, 130, 0.6) !important;
+}
+/* Ensure pieces don't block clicks to the square elements */
+.piece-417db {
+    pointer-events: none;
 }
 
 .btn {
@@ -164,12 +140,14 @@ p {
     cursor: pointer;
     transition: background-color 0.3s, transform 0.1s;
     font-weight: 600;
+    min-width: 120px;
+    /* Ensure buttons are easily tappable */
 }
 
 .btn:hover {
     background-color: #764ba2;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn:active {
@@ -225,7 +203,7 @@ p {
     border-left: 3px solid #667eea;
 }
 
-/* Modal Styles */
+/* Modal Styles (unchanged) */
 .modal {
     display: none;
     position: fixed;
@@ -234,7 +212,7 @@ p {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 .modal.show {
@@ -247,7 +225,7 @@ p {
     background-color: white;
     padding: 30px;
     border-radius: 12px;
-    box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
     max-width: 500px;
     width: 90%;
     max-height: 80vh;
@@ -357,7 +335,8 @@ p {
     background-color: #c0392b;
 }
 
-@media (max-width: 600px) {
+/* Responsive adjustments for very small screens */
+@media (max-width: 480px) {
     .container {
         padding: 15px;
     }
@@ -366,23 +345,10 @@ p {
         font-size: 2em;
     }
 
-    .board {
-        grid-template-columns: repeat(8, 45px);
-    }
-
-    .square {
-        width: 45px;
-        height: 45px;
-        font-size: 2em;
-    }
-
     .btn {
-        padding: 10px 14px;
+        padding: 10px 12px;
         font-size: 0.85em;
-    }
-
-    .actions {
-        gap: 8px;
+        min-width: 100px;
     }
 
     .game-info {
@@ -392,11 +358,12 @@ p {
     .turn-display,
     .status-display {
         width: 100%;
+        font-size: 1.1em;
     }
 
-    .modal-content {
-        width: 95%;
-        padding: 20px;
+    #board {
+        max-width: 100%;
+        border-width: 2px;
     }
 
     .library-item {
@@ -411,6 +378,10 @@ p {
 
     .library-item-buttons button {
         flex: 1;
+    }
+
+    .move-log {
+        padding: 15px;
     }
 }
 
@@ -435,4 +406,8 @@ p {
 .move-log::-webkit-scrollbar-thumb:hover,
 .library-list::-webkit-scrollbar-thumb:hover {
     background: #764ba2;
+}
+
+#board img[src*="black"] {
+    transform: rotate(180deg);
 }

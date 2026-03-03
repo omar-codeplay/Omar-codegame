@@ -2,41 +2,54 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
     color: #222;
     min-height: 100vh;
-    padding: 20px;
+    margin: 0;
+    padding: 16px;
+    box-sizing: border-box;
 }
 
 h1 {
     color: #fff;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    text-align: center;
+    font-size: clamp(1.8rem, 6vw, 2.8rem);
+    margin: 0 0 10px 0;
 }
 
 #game-board {
     display: grid;
     grid-gap: 10px;
-    margin-top: 20px;
-    padding: 10px;
+    margin: 20px auto;
+    padding: 12px;
     background: rgba(255,255,255,0.2);
-    border-radius: 12px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;           /* Reduced from 900px to keep cards smaller on PC */
+    box-sizing: border-box;
+    justify-content: center;
 }
 
 .card {
-    width: 100px;
-    height: 100px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
     background-color: #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2em;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);  /* Slightly reduced max font size */
     cursor: pointer;
-    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
-    border-radius: 10px;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    border-radius: 12px;
     position: relative;
     transform-style: preserve-3d;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
+
 
 .card:hover {
     transform: scale(1.05);
@@ -62,11 +75,11 @@ h1 {
 .card .front {
     background-color: #fff;
     transform: rotateY(180deg);
-    visibility: hidden;
+    visibility: hidden;        /* hidden until flipped */
 }
 
 .card.flipped .front {
-    visibility: visible;
+    visibility: visible;       /* shown when flipped */
 }
 
 .card .back {
@@ -86,20 +99,29 @@ h1 {
 
 #tries {
     margin-top: 20px;
-    font-size: 1.5em;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
     color: #fff;
+    text-align: center;
 }
 
-#reset-button {
+#reset-button, #hint-button {
     margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1em;
+    padding: 12px 24px;
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
     background-color: #333;
     color: #fff;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.2s;
+    width: auto;
+    min-width: 160px;
+    max-width: 90%;
+}
+
+#hint-button {
+    background-color: #ff9800;
+    margin-top: 10px;
 }
 
 #reset-button:hover {
@@ -107,23 +129,12 @@ h1 {
     transform: scale(1.05);
 }
 
-#hint-button {
-    margin-top: 10px;
-    padding: 8px 16px;
-    border-radius: 5px;
-    background-color: #ff9800;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-}
-
 #hint-button:hover {
     background-color: #fb8c00;
     transform: scale(1.05);
 }
 
-/* shake animation for incorrect guess */
+/* Shake animation */
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
@@ -136,18 +147,31 @@ h1 {
   animation: shake 0.4s;
 }
 
-/* responsive behavior */
-@media (max-width: 600px) {
+/* Responsive adjustments */
+@media (max-width: 700px) {
+    #game-board {
+        max-width: 100%;        /* On smaller screens, allow board to fill width */
+        grid-gap: 8px;
+        padding: 8px;
+    }
     .card {
-        width: 70px;
-        height: 70px;
-        font-size: 1.5em;
+        font-size: clamp(1.2rem, 4vw, 2rem);
+    }
+}
+
+@media (max-width: 480px) {
+    #game-board {
+        grid-gap: 6px;
+        padding: 6px;
+    }
+    .card {
+        font-size: 1.1rem;
     }
     #tries {
-        font-size: 1.2em;
+        font-size: 1.2rem;
     }
-    #reset-button, #hint-button {
-        padding: 8px 16px;
-        font-size: 0.9em;
+    button {
+        padding: 10px 16px;
+        font-size: 0.9rem;
     }
 }

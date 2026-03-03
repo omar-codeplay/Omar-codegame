@@ -1,18 +1,3 @@
-const pieceImages = {
-    'p': 'chess/images/black-pawn.png',
-    'r': 'chess/images/black-rook.png',
-    'n': 'chess/images/black-knight.png',
-    'b': 'chess/images/black-bishop.png',
-    'q': 'chess/images/black-queen.png',
-    'k': 'chess/images/black-king.png',
-    'P': 'chess/images/white-pawn.png',
-    'R': 'chess/images/white-rook.png',
-    'N': 'chess/images/white-knight.png',
-    'B': 'chess/images/white-bishop.png',
-    'Q': 'chess/images/white-queen.png',
-    'K': 'chess/images/white-king.png'
-};
-
 class GameLibrary {
     constructor() {
         this.games = this.loadGames();
@@ -57,242 +42,169 @@ class GameLibrary {
 class ChessGame {
     constructor() {
         try {
-            if (typeof Chess === 'undefined') {
-                throw new Error('Chess library not loaded');
-            }
+            if (typeof Chess === 'undefined') throw new Error('Chess library not loaded');
             this.chess = new Chess();
         } catch (e) {
             this.chess = null;
+            console.error('Chess library failed to load');
+            return;
         }
-        
-        this.selectedSquare = null;
+
         this.library = new GameLibrary();
-        this.audioContext = null;
-        this.currentMoveIndex = -1; // -1 means we're at the current game position
-        
-        // Drag-to-move properties
+        this.selectedSquare = null;
         this.isDragging = false;
-        this.dragSource = null;
-        this.dragOffsetX = 0;
-        this.dragOffsetY = 0;
-        
-        this.renderBoard();
+
+        this.board = ChessBoard('board', {
+            draggable: true,
+            position: 'start',
+            orientation: 'white',
+            onDragStart: this.onDragStart.bind(this),
+            onDrop: this.onDrop.bind(this),
+            onSnapEnd: this.onSnapEnd.bind(this),
+            pieceTheme: this.pieceTheme.bind(this)
+        });
+
+        window.addEventListener('resize', () => this.board.resize());
+
+        // THEME INITIALIZATION
+        this.themeSelect = document.getElementById('board-theme');
+        this.applyTheme(this.themeSelect ? this.themeSelect.value : 'green');
+
+        // CLICK-TO-MOVE HANDLER
+        document.getElementById('board').addEventListener('click', (e) => {
+            const squareElement = e.target.closest('.square-55d63');
+            if (!squareElement) return;
+
+            const square = squareElement.getAttribute('data-square');
+            if (square) {
+                this.onSquareClick(square);
+            }
+        });
+
         this.updateTurnDisplay();
+        this.updateMoveLog();
         this.attachEventListeners();
     }
 
-    renderBoard() {
-        const boardElement = document.getElementById('board');
-        if (!boardElement) {
-            console.error('Board element not found');
-            return;
-        }
-        
-        boardElement.innerHTML = '';
-        
-        // Get FEN - use default if chess library not available
-        let fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-        if (this.chess && typeof this.chess.fen === 'function') {
-            try {
-                fen = this.chess.fen();
-            } catch (e) {
-                // Use default
-            }
-        }
-        
-        // Parse FEN and create board
-        const fenBoard = fen.split(' ')[0].split('/');
-        let squareIdx = 0;
-        
-        for (let row = 0; row < 8; row++) {
-            const rankStr = fenBoard[row];
-            for (let col = 0; col < rankStr.length; col++) {
-                const char = rankStr[col];
-                
-                if (/\d/.test(char)) {
-                    // Empty squares
-                    const emptyCount = parseInt(char);
-                    for (let e = 0; e < emptyCount; e++) {
-                        const currentCol = (squareIdx) % 8;
-                        const isLight = (row + currentCol) % 2 === 0;
-                        const squareName = this.getSquareName(row, currentCol);
-                        
-                        const square = document.createElement('div');
-                        square.className = 'square ' + (isLight ? 'light' : 'dark');
-                        square.id = `square-${squareName}`;
-                        square.dataset.square = squareName;
-                        square.addEventListener('click', () => this.onSquareClick(squareName));
-                        square.addEventListener('mousedown', (e) => this.onSquareMouseDown(e, squareName));
-                        square.addEventListener('mousemove', (e) => this.onSquareMouseMove(e, squareName));
-                        square.addEventListener('mouseup', (e) => this.onSquareMouseUp(e, squareName));
-                        square.addEventListener('mouseleave', (e) => this.onSquareMouseLeave(e, squareName));
-                        boardElement.appendChild(square);
-                        squareIdx++;
-                    }
-                } else {
-                    // Piece square
-                    const currentCol = (squareIdx) % 8;
-                    const isLight = (row + currentCol) % 2 === 0;
-                    const squareName = this.getSquareName(row, currentCol);
-                    
-                    const square = document.createElement('div');
-                    square.className = 'square ' + (isLight ? 'light' : 'dark');
-                    square.id = `square-${squareName}`;
-                    square.dataset.square = squareName;
-                    
-                    if (pieceImages[char]) {
-                        const img = document.createElement('img');
-                        img.src = pieceImages[char];
-                        img.className = 'piece';
-                        img.draggable = false;
-                        square.appendChild(img);
-                    }
-                    
-                    square.addEventListener('click', () => this.onSquareClick(squareName));
-                    square.addEventListener('mousedown', (e) => this.onSquareMouseDown(e, squareName));
-                    square.addEventListener('mousemove', (e) => this.onSquareMouseMove(e, squareName));
-                    square.addEventListener('mouseup', (e) => this.onSquareMouseUp(e, squareName));
-                    square.addEventListener('mouseleave', (e) => this.onSquareMouseLeave(e, squareName));
-                    boardElement.appendChild(square);
-                    squareIdx++;
-                }
-            }
-        }
+    getSquareElement(square) {
+        return document.querySelector(`#board .square-55d63[data-square="${square}"]`);
     }
 
-    getSquareName(row, col) {
-        const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-        const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
-        return files[col] + ranks[row];
+    applyTheme(themeName) {
+        const boardEl = document.getElementById('board');
+        if (!boardEl) return;
+        // Remove all potential theme classes
+        boardEl.classList.remove('theme-green', 'theme-wood', 'theme-ocean');
+        // Add the selected one
+        boardEl.classList.add(`theme-${themeName}`);
+    }
+
+    highlightLastMove() {
+        // Remove old highlights
+        document.querySelectorAll('.last-move').forEach(el => el.classList.remove('last-move'));
+
+        const history = this.chess.history({ verbose: true });
+        if (history.length === 0) return;
+
+        const lastMove = history[history.length - 1];
+        const fromEl = this.getSquareElement(lastMove.from);
+        const toEl = this.getSquareElement(lastMove.to);
+
+        if (fromEl) fromEl.classList.add('last-move');
+        if (toEl) toEl.classList.add('last-move');
+    }
+
+    pieceTheme(piece) {
+        const color = piece[0] === 'w' ? 'white' : 'black';
+        const type = piece[1].toLowerCase();
+        const pieceNames = { 'p': 'pawn', 'n': 'knight', 'b': 'bishop', 'r': 'rook', 'q': 'queen', 'k': 'king' };
+        return `chess/images/${color}-${pieceNames[type]}.png`;
+    }
+
+    onDragStart(source, piece, position, orientation) {
+        this.isDragging = true;
+        this.clearSelection();
+        if (this.chess.game_over()) return false;
+        if ((this.chess.turn() === 'w' && piece.search(/^b/) !== -1) ||
+            (this.chess.turn() === 'b' && piece.search(/^w/) !== -1)) {
+            return false;
+        }
+        return true;
+    }
+
+    onDrop(source, target) {
+        const move = this.chess.move({ from: source, to: target, promotion: 'q' });
+        if (move === null) {
+            setTimeout(() => { this.isDragging = false; }, 100);
+            return 'snapback';
+        }
+        this.updateTurnDisplay();
+        this.updateMoveLog();
+        this.highlightLastMove();
+        setTimeout(() => { this.isDragging = false; }, 100);
+        this.clearSelection();
+    }
+
+    onSnapEnd() {
+        this.board.position(this.chess.fen());
+        setTimeout(() => { this.isDragging = false; }, 100);
     }
 
     onSquareClick(square) {
+        if (this.isDragging) return;
+
         if (!this.selectedSquare) {
-            // Select a piece
             const piece = this.chess.get(square);
-            if (piece && piece.color === (this.chess.turn() === 'w' ? 'w' : 'b')) {
+            if (piece && piece.color === this.chess.turn()) {
                 this.selectedSquare = square;
-                document.getElementById(`square-${square}`).classList.add('selected');
-                this.showLegalMoves(square);
+                this.highlightSquare(square);
             }
-        } else {
-            // Try to move or select another piece
-            if (this.selectedSquare === square) {
-                // Deselect
-                this.clearSelection();
-            } else {
-                // Try to move
-                const move = this.chess.move({
-                    from: this.selectedSquare,
-                    to: square,
-                    promotion: 'q' // default to queen promotion
-                });
-
-                if (move) {
-                    this.renderBoard();
-                    this.updateTurnDisplay();
-                    this.updateMoveLog();
-                    this.selectedSquare = null;
-                } else {
-                    // Try selecting another piece
-                    this.clearSelection();
-                    const piece = this.chess.get(square);
-                    if (piece && piece.color === (this.chess.turn() === 'w' ? 'w' : 'b')) {
-                        this.selectedSquare = square;
-                        document.getElementById(`square-${square}`).classList.add('selected');
-                        this.showLegalMoves(square);
-                    }
-                }
-            }
+            return;
         }
-    }
 
-    onSquareMouseDown(e, square) {
-        // Check if there's a piece on this square and it's the current player's piece
-        const piece = this.chess.get(square);
-        if (piece && piece.color === (this.chess.turn() === 'w' ? 'w' : 'b')) {
-            this.isDragging = true;
-            this.dragSource = square;
-            const squareElement = document.getElementById(`square-${square}`);
-            squareElement.classList.add('dragging');
+        if (this.selectedSquare === square) {
             this.clearSelection();
-            this.selectedSquare = square;
-            squareElement.classList.add('selected');
-            this.showLegalMoves(square);
-            e.preventDefault();
+            return;
         }
-    }
 
-    onSquareMouseMove(e, square) {
-        // Optional: Could add visual feedback here (e.g., highlight potential drop target)
-    }
+        const move = this.chess.move({ from: this.selectedSquare, to: square, promotion: 'q' });
 
-    onSquareMouseUp(e, square) {
-        if (this.isDragging && this.dragSource) {
-            const sourceElement = document.getElementById(`square-${this.dragSource}`);
-            if (sourceElement) {
-                sourceElement.classList.remove('dragging');
-            }
-
-            if (this.dragSource === square) {
-                // Dropped on same square - just clear selection
+        if (move) {
+            this.board.position(this.chess.fen());
+            this.updateTurnDisplay();
+            this.updateMoveLog();
+            this.highlightLastMove();
+            this.clearSelection();
+        } else {
+            const piece = this.chess.get(square);
+            if (piece && piece.color === this.chess.turn()) {
                 this.clearSelection();
+                this.selectedSquare = square;
+                this.highlightSquare(square);
             } else {
-                // Try to move
-                const move = this.chess.move({
-                    from: this.dragSource,
-                    to: square,
-                    promotion: 'q' // default to queen promotion
-                });
-
-                if (move) {
-                    this.renderBoard();
-                    this.updateTurnDisplay();
-                    this.updateMoveLog();
-                    this.selectedSquare = null;
-                } else {
-                    // Invalid move - reselect source piece
-                    this.clearSelection();
-                    this.selectedSquare = this.dragSource;
-                    sourceElement.classList.add('selected');
-                    this.showLegalMoves(this.dragSource);
-                }
+                this.clearSelection();
             }
-
-            this.isDragging = false;
-            this.dragSource = null;
         }
-        e.preventDefault();
     }
 
-    onSquareMouseLeave(e, square) {
-        // Optional: Could add visual feedback here
-    }
-
-    showLegalMoves(square) {
-        const moves = this.chess.moves({ square: square, verbose: true });
-        moves.forEach(move => {
-            const squareElement = document.getElementById(`square-${move.to}`);
-            if (squareElement) {
-                squareElement.classList.add('legal-move');
-            }
-        });
+    highlightSquare(square) {
+        const squareEl = this.getSquareElement(square);
+        if (squareEl) squareEl.classList.add('selected');
     }
 
     clearSelection() {
         if (this.selectedSquare) {
-            document.getElementById(`square-${this.selectedSquare}`).classList.remove('selected');
-            const allSquares = document.querySelectorAll('.square');
-            allSquares.forEach(sq => sq.classList.remove('legal-move'));
+            const oldEl = this.getSquareElement(this.selectedSquare);
+            if (oldEl) oldEl.classList.remove('selected');
         }
         this.selectedSquare = null;
     }
 
-
     resetGame() {
         this.chess.reset();
+        this.board.position('start');
         this.clearSelection();
-        this.renderBoard();
+        document.querySelectorAll('.last-move').forEach(el => el.classList.remove('last-move'));
         this.updateTurnDisplay();
         this.updateMoveLog();
     }
@@ -300,227 +212,82 @@ class ChessGame {
     undoMove() {
         if (this.chess.history().length > 0) {
             this.chess.undo();
-            this.currentMoveIndex = this.chess.history().length - 1;
+            this.board.position(this.chess.fen());
             this.clearSelection();
-            this.renderBoard();
+            this.highlightLastMove();
             this.updateTurnDisplay();
             this.updateMoveLog();
         }
     }
 
-    prevMove() {
-        // Undo one move
-        this.undoMove();
+    loadFen(fen) {
+        try {
+            this.chess.load(fen);
+            this.board.position(this.chess.fen());
+            this.clearSelection();
+            this.highlightLastMove();
+            this.updateTurnDisplay();
+            this.updateMoveLog();
+        } catch (e) { }
     }
 
-    nextMove() {
-        // Can't redo without storing history
-        // This would require a more complex implementation
-        // For now, this is disabled
-    }
-
-    attachEventListeners() {
-        const resetBtn = document.getElementById('reset-btn');
-        const undoBtn = document.getElementById('undo-btn');
-        const loadFenBtn = document.getElementById('load-fen-btn');
-        const exportPgnBtn = document.getElementById('export-pgn-btn');
-        const saveLbtn = document.getElementById('save-lib-btn');
-        const libBtn = document.getElementById('lib-btn');
-
-        const fenModal = document.getElementById('fen-modal');
-        const libraryModal = document.getElementById('library-modal');
-        const saveModal = document.getElementById('save-modal');
-
-        const confirmFenBtn = document.getElementById('confirm-fen-btn');
-        const confirmSaveBtn = document.getElementById('confirm-save-btn');
-        const closeFenBtn = fenModal.querySelector('.close');
-        const closeLibraryBtn = libraryModal.querySelector('.close');
-        const closeSaveBtn = saveModal.querySelector('.close');
-
-        if (resetBtn) resetBtn.addEventListener('click', () => this.resetGame());
-        if (undoBtn) undoBtn.addEventListener('click', () => this.undoMove());
-
-        const prevMoveBtn = document.getElementById('prev-move-btn');
-        const nextMoveBtn = document.getElementById('next-move-btn');
-        if (prevMoveBtn) prevMoveBtn.addEventListener('click', () => this.prevMove());
-        if (nextMoveBtn) nextMoveBtn.addEventListener('click', () => this.nextMove());
-
-        if (loadFenBtn) {
-            loadFenBtn.addEventListener('click', () => {
-                document.getElementById('fen-input').value = this.chess.fen();
-                fenModal.classList.add('show');
-            });
-        }
-
-        if (exportPgnBtn) {
-            exportPgnBtn.addEventListener('click', () => {
-                const pgn = this.generatePGN();
-                const blob = new Blob([pgn], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'game.pgn';
-                a.click();
-                URL.revokeObjectURL(url);
-            });
-        }
-
-        if (saveLbtn) {
-            saveLbtn.addEventListener('click', () => {
-                saveModal.classList.add('show');
-                document.getElementById('game-name').value = 'Game ' + new Date().toLocaleTimeString();
-            });
-        }
-
-        if (libBtn) {
-            libBtn.addEventListener('click', () => {
-                this.updateLibraryUI();
-                libraryModal.classList.add('show');
-            });
-        }
-
-        if (confirmFenBtn) {
-            confirmFenBtn.addEventListener('click', () => {
-                const fen = document.getElementById('fen-input').value;
-                try {
-                    this.chess.load(fen);
-                    this.clearSelection();
-                    this.renderBoard();
-                    this.updateTurnDisplay();
-                    this.updateMoveLog();
-                    fenModal.classList.remove('show');
-                } catch (error) {
-                    // Invalid FEN - silently fail
-                }
-            });
-        }
-
-        if (confirmSaveBtn) {
-            confirmSaveBtn.addEventListener('click', () => {
-                const name = document.getElementById('game-name').value || 'Untitled Game';
-                this.library.saveGame(name, this.generatePGN());
-                saveModal.classList.remove('show');
-            });
-        }
-
-        if (closeFenBtn) closeFenBtn.addEventListener('click', () => fenModal.classList.remove('show'));
-        if (closeLibraryBtn) closeLibraryBtn.addEventListener('click', () => libraryModal.classList.remove('show'));
-        if (closeSaveBtn) closeSaveBtn.addEventListener('click', () => saveModal.classList.remove('show'));
-
-        // Close modals when clicking outside
-        window.addEventListener('click', (e) => {
-            if (e.target === fenModal) fenModal.classList.remove('show');
-            if (e.target === libraryModal) libraryModal.classList.remove('show');
-            if (e.target === saveModal) saveModal.classList.remove('show');
-        });
+    generatePGN() {
+        const dateStr = new Date().toISOString().split('T')[0];
+        let pgn = `[Event "Casual Chess Game"]\n[Site "Offline"]\n[Date "${dateStr}"]\n[White "Player 1"]\n[Black "Player 2"]\n[Result "*"]\n\n`;
+        pgn += this.chess.pgn({ max_width: 80, newline: '\n' });
+        return pgn;
     }
 
     updateTurnDisplay() {
         const turnDisplay = document.getElementById('turn');
-        if (!turnDisplay) {
-            console.warn('Turn display element not found');
-            return;
-        }
-        
-        if (!this.chess) {
-            turnDisplay.textContent = 'Waiting for chess library...';
-            return;
-        }
-        
-        try {
-            const turn = this.chess.turn() === 'w' ? 'White' : 'Black';
-            const symbol = this.chess.turn() === 'w' ? '⚪' : '⚫';
-            turnDisplay.textContent = symbol + ' ' + turn.toUpperCase() + "'S TURN";
-            
-            // Check for game status
-            const statusDisplay = document.getElementById('game-status');
-            if (statusDisplay) {
-                if (this.chess.in_checkmate()) {
-                    statusDisplay.textContent = '♔ Checkmate! ' + (turn === 'White' ? 'Black' : 'White') + ' wins!';
-                } else if (this.chess.in_check()) {
-                    statusDisplay.textContent = '⚠️ Check!';
-                } else if (this.chess.in_draw()) {
-                    statusDisplay.textContent = 'Game Draw';
-                } else {
-                    statusDisplay.textContent = '';
-                }
+        const statusDisplay = document.getElementById('game-status');
+        if (!turnDisplay) return;
+
+        const turn = this.chess.turn() === 'w' ? 'White' : 'Black';
+        const symbol = this.chess.turn() === 'w' ? '⚪' : '⚫';
+        turnDisplay.textContent = `${symbol} ${turn.toUpperCase()}'S TURN`;
+
+        if (statusDisplay) {
+            if (this.chess.in_checkmate()) {
+                const winner = this.chess.turn() === 'w' ? 'Black' : 'White';
+                statusDisplay.textContent = `♔ Checkmate! ${winner} wins!`;
+            } else if (this.chess.in_check()) {
+                statusDisplay.textContent = '⚠️ Check!';
+            } else if (this.chess.in_draw()) {
+                statusDisplay.textContent = 'Game Draw';
+            } else {
+                statusDisplay.textContent = '';
             }
-        } catch (e) {
-            console.error('Error in updateTurnDisplay:', e);
-            turnDisplay.textContent = 'Error loading game state';
         }
     }
 
     updateMoveLog() {
         const history = this.chess.history({ verbose: true });
         const movesDiv = document.getElementById('moves');
+        if (!movesDiv) return;
         movesDiv.innerHTML = '';
 
         for (let i = 0; i < history.length; i++) {
             const moveNum = Math.floor(i / 2) + 1;
-            const move = history[i];
-            
             if (i % 2 === 0) {
                 const entry = document.createElement('span');
                 entry.className = 'move-entry';
-                entry.textContent = moveNum + '. ' + move.san + ' ';
+                entry.textContent = `${moveNum}. ${history[i].san} `;
                 movesDiv.appendChild(entry);
             } else {
-                movesDiv.children[movesDiv.children.length - 1].textContent += move.san + ' ';
+                movesDiv.lastChild.textContent += `${history[i].san} `;
             }
         }
-
-        // Update PGN notation
-        const pgn = this.generatePGN();
-        document.getElementById('pgn-notation').textContent = pgn;
-    }
-
-    generatePGN() {
-        const dateStr = new Date().toISOString().split('T')[0];
-        let pgn = '';
-        
-        pgn += '[Event "Casual Chess Game"]\n';
-        pgn += '[Site "Offline"]\n';
-        pgn += '[Date "' + dateStr + '"]\n';
-        pgn += '[White "Player 1"]\n';
-        pgn += '[Black "Player 2"]\n';
-        
-        if (this.chess.in_checkmate()) {
-            pgn += '[Result "' + (this.chess.turn() === 'w' ? '0-1' : '1-0') + '"]\n\n';
-        } else {
-            pgn += '[Result "*"]\n\n';
-        }
-        
-        const history = this.chess.history({ verbose: true });
-        const moves = [];
-        
-        for (let i = 0; i < history.length; i += 2) {
-            const moveNum = Math.floor(i / 2) + 1;
-            const whiteMove = history[i] ? history[i].san : '(...)';
-            const blackMove = history[i + 1] ? history[i + 1].san : '';
-            
-            if (blackMove) {
-                moves.push(moveNum + '. ' + whiteMove + ' ' + blackMove);
-            } else {
-                moves.push(moveNum + '. ' + whiteMove);
-            }
-        }
-        
-        pgn += moves.join(' ');
-        if (this.chess.in_checkmate()) {
-            pgn += ' ' + (this.chess.turn() === 'w' ? '0-1' : '1-0');
-        } else {
-            pgn += ' *';
-        }
-        
-        return pgn;
+        const pgnText = document.getElementById('pgn-notation');
+        if (pgnText) pgnText.textContent = this.generatePGN();
     }
 
     updateLibraryUI() {
         const libraryList = document.getElementById('library-list');
+        if (!libraryList) return;
         libraryList.innerHTML = '';
-
         const games = this.library.getAllGames();
+
         if (games.length === 0) {
             libraryList.innerHTML = '<p>No saved games.</p>';
             return;
@@ -537,24 +304,19 @@ class ChessGame {
                 <div class="library-item-buttons">
                     <button class="load">Load</button>
                     <button class="delete">Delete</button>
-                </div>
-            `;
+                </div>`;
 
             item.querySelector('.load').addEventListener('click', () => {
                 const savedGame = this.library.loadGame(game.id);
                 if (savedGame) {
-                    try {
-                        this.chess.reset();
-                        // Parse and replay PGN to restore position
-                        // For now, just load the starting position
-                        this.clearSelection();
-                        this.renderBoard();
-                        this.updateTurnDisplay();
-                        this.updateMoveLog();
-                        document.getElementById('library-modal').classList.remove('show');
-                    } catch (error) {
-                        // Failed to load game - silently fail
-                    }
+                    this.chess.reset();
+                    this.chess.load_pgn(savedGame.pgn);
+                    this.board.position(this.chess.fen());
+                    this.clearSelection();
+                    this.highlightLastMove();
+                    this.updateTurnDisplay();
+                    this.updateMoveLog();
+                    document.getElementById('library-modal').classList.remove('show');
                 }
             });
 
@@ -562,8 +324,67 @@ class ChessGame {
                 this.library.deleteGame(game.id);
                 this.updateLibraryUI();
             });
-
             libraryList.appendChild(item);
+        });
+    }
+
+    attachEventListeners() {
+        document.getElementById('reset-btn')?.addEventListener('click', () => this.resetGame());
+        document.getElementById('undo-btn')?.addEventListener('click', () => this.undoMove());
+
+        this.themeSelect?.addEventListener('change', (e) => this.applyTheme(e.target.value));
+
+        const loadFenBtn = document.getElementById('load-fen-btn');
+        const fenModal = document.getElementById('fen-modal');
+        if (loadFenBtn) {
+            loadFenBtn.addEventListener('click', () => {
+                document.getElementById('fen-input').value = this.chess.fen();
+                fenModal.classList.add('show');
+            });
+        }
+
+        document.getElementById('export-pgn-btn')?.addEventListener('click', () => {
+            const pgn = this.generatePGN();
+            const blob = new Blob([pgn], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'game.pgn'; a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        const saveLibBtn = document.getElementById('save-lib-btn');
+        const saveModal = document.getElementById('save-modal');
+        if (saveLibBtn) {
+            saveLibBtn.addEventListener('click', () => {
+                saveModal.classList.add('show');
+                document.getElementById('game-name').value = `Game ${new Date().toLocaleTimeString()}`;
+            });
+        }
+
+        document.getElementById('lib-btn')?.addEventListener('click', () => {
+            this.updateLibraryUI();
+            document.getElementById('library-modal').classList.add('show');
+        });
+
+        document.getElementById('confirm-fen-btn')?.addEventListener('click', () => {
+            this.loadFen(document.getElementById('fen-input').value);
+            fenModal.classList.remove('show');
+        });
+
+        document.getElementById('confirm-save-btn')?.addEventListener('click', () => {
+            const name = document.getElementById('game-name').value || 'Untitled Game';
+            this.library.saveGame(name, this.generatePGN());
+            saveModal.classList.remove('show');
+        });
+
+        document.querySelectorAll('.close').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
+            });
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) e.target.classList.remove('show');
         });
     }
 }
