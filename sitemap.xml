@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>https://omar-gameplay.netlify.app/</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/tic%20tac%20toe</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/chess</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/connect4</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/memory</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/cube</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/crossroad</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/coloriq</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/bakasa</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://omar-gameplay.netlify.app/fortress</loc>
+  <lastmod>2026-03-03T04:37:56+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+
+</urlset>
