@@ -1,72 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Game</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
-    <link rel="stylesheet" href="chess/Chess.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
-    <script defer src="chess/Chess.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Chess</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <link rel="stylesheet" href="chess/Chess.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 </head>
-
 <body>
-    <div class="container">
-        <h1>Chess Game</h1>
-        <p>Drag or click pieces to move. White at bottom.</p>
 
-        <div class="game-info">
-            <div id="turn" class="turn-display">White's Turn</div>
-            <div id="game-status" class="status-display"></div>
-        </div>
+<!-- ══ TIME CONTROL PICKER ══ -->
+<div id="setup-overlay" class="overlay-screen">
+  <div class="setup-card">
+    <div class="setup-logo">♞ Chess</div>
+    <h2 class="setup-heading">Choose Time Control</h2>
 
-        <div id="board" class="board"></div>
-
-        <div class="actions">
-            <button id="reset-btn" class="btn">New Game</button>
-            <button id="undo-btn" class="btn">Undo Move</button>
-            <button id="load-fen-btn" class="btn">Load FEN</button>
-            <button id="export-pgn-btn" class="btn">Export PGN</button>
-            <button id="save-lib-btn" class="btn">Save Game</button>
-            <button id="lib-btn" class="btn">Game Library</button>
-        </div>
-
-        <div class="theme-selector">
-            <label for="board-theme">Theme:</label>
-            <select id="board-theme" class="btn">
-                <option value="classic">Classic Wood</option>
-                <option value="green" selected>Chess.com Green</option>
-                <option value="ocean">Ocean Blue</option>
-            </select>
-        </div>
-
-        <div id="fen-modal" class="modal">
-            <div class="modal-content"><span class="close">&times;</span>
-                <h2>FEN</h2><textarea id="fen-input" rows="4"></textarea><button id="confirm-fen-btn"
-                    class="btn">Load</button>
-            </div>
-        </div>
-        <div id="library-modal" class="modal">
-            <div class="modal-content"><span class="close">&times;</span>
-                <h2>Library</h2>
-                <div id="library-list"></div>
-            </div>
-        </div>
-        <div id="save-modal" class="modal">
-            <div class="modal-content"><span class="close">&times;</span>
-                <h2>Save</h2><input type="text" id="game-name"><button id="confirm-save-btn" class="btn">Save</button>
-            </div>
-        </div>
-
-        <div id="move-log" class="move-log">
-            <h3>Move History</h3>
-            <p id="pgn-notation" class="pgn-notation"></p>
-            <div id="moves"></div>
-        </div>
+    <div class="tc-tabs">
+      <button class="tc-tab active" data-cat="bullet">🔥 Bullet</button>
+      <button class="tc-tab" data-cat="blitz">⚡ Blitz</button>
+      <button class="tc-tab" data-cat="rapid">🕐 Rapid</button>
+      <button class="tc-tab" data-cat="classical">♟ Classical</button>
+      <button class="tc-tab" data-cat="unlimited">∞ Unlimited</button>
+      <button class="tc-tab" data-cat="custom">⚙ Custom</button>
     </div>
-</body>
 
+    <div class="tc-options" id="tc-options"><!-- JS fills --></div>
+
+    <div class="custom-tc" id="custom-tc">
+      <div class="custom-fields">
+        <div class="cf-group">
+          <label>Minutes / side</label>
+          <input type="number" id="custom-min" min="0" max="180" value="10">
+        </div>
+        <div class="cf-plus">+</div>
+        <div class="cf-group">
+          <label>Increment (sec)</label>
+          <input type="number" id="custom-inc" min="0" max="60" value="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-names">
+      <div class="sn-field">
+        <div class="sn-icon white-av">♕</div>
+        <input type="text" id="name-white" value="Player 1" maxlength="20" class="sn-input">
+      </div>
+      <div class="sn-vs">vs</div>
+      <div class="sn-field">
+        <div class="sn-icon black-av">♛</div>
+        <input type="text" id="name-black" value="Player 2" maxlength="20" class="sn-input">
+      </div>
+    </div>
+
+    <button id="start-btn" class="start-btn">▶ Play</button>
+  </div>
+</div>
+
+<!-- ══ PROMOTION PICKER ══ -->
+<div id="promo-overlay" class="overlay-screen" style="display:none">
+  <div class="promo-card">
+    <div class="promo-heading">Promote Pawn</div>
+    <div class="promo-grid" id="promo-grid"><!-- JS fills --></div>
+  </div>
+</div>
+
+<!-- ══ GAME RESULT ══ -->
+<div id="result-overlay" class="overlay-screen" style="display:none">
+  <div class="result-card">
+    <div class="result-emblem" id="result-emblem">♔</div>
+    <div class="result-title" id="result-title">White Wins!</div>
+    <div class="result-reason" id="result-reason">by checkmate</div>
+    <div class="result-names">
+      <span id="rs-white">Player 1</span>
+      <span class="result-vs">vs</span>
+      <span id="rs-black">Player 2</span>
+    </div>
+    <div class="result-actions">
+      <button class="ra-btn" id="ra-new">New Game</button>
+      <button class="ra-btn ra-rematch" id="ra-rematch">Rematch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN GAME ══ -->
+<div class="game-app" id="game-app" style="display:none">
+
+  <!-- Board column -->
+  <div class="board-col">
+
+    <!-- Black (top) -->
+    <div class="player-strip" id="strip-black">
+      <div class="ps-avatar black-av">♛</div>
+      <div class="ps-info">
+        <div class="ps-name" id="pname-black">Player 2</div>
+        <div class="ps-captured" id="cap-black"></div>
+      </div>
+      <div class="ps-clock paused" id="clock-black">
+        <span id="time-black">—</span>
+      </div>
+    </div>
+
+    <!-- Board row: eval + board -->
+    <div class="board-row">
+      <div class="eval-col">
+        <span class="eval-lbl" id="eval-top"></span>
+        <div class="eval-track">
+          <div class="eval-thumb" id="eval-thumb" style="height:50%"></div>
+        </div>
+        <span class="eval-lbl" id="eval-bot">+0.0</span>
+      </div>
+      <div id="board" class="board-el theme-green"></div>
+    </div>
+
+    <!-- White (bottom) -->
+    <div class="player-strip active-strip" id="strip-white">
+      <div class="ps-avatar white-av">♕</div>
+      <div class="ps-info">
+        <div class="ps-name" id="pname-white">Player 1</div>
+        <div class="ps-captured" id="cap-white"></div>
+      </div>
+      <div class="ps-clock active" id="clock-white">
+        <span id="time-white">—</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <!-- Top row: game badge + flip/theme -->
+    <div class="sb-topbar">
+      <div class="game-badge" id="game-badge">Rapid · 10+0</div>
+      <div class="sb-icons">
+        <button class="icon-btn" id="flip-btn" title="Flip board">⇅</button>
+        <button class="icon-btn" id="theme-btn" title="Theme">🎨</button>
+      </div>
+    </div>
+
+    <!-- Theme picker row -->
+    <div class="theme-row" id="theme-row" style="display:none">
+      <button class="th-swatch active" data-theme="green" title="Chess.com Green"    style="--a:#eeeed2;--b:#769656"></button>
+      <button class="th-swatch"        data-theme="classic" title="Classic Wood"     style="--a:#edd6af;--b:#b88761"></button>
+      <button class="th-swatch"        data-theme="ocean"   title="Ocean"             style="--a:#dee3e6;--b:#8ca2ad"></button>
+      <button class="th-swatch"        data-theme="walnut"  title="Walnut"            style="--a:#f0cfa0;--b:#7d4f2a"></button>
+      <button class="th-swatch"        data-theme="midnight"title="Midnight"          style="--a:#b4c7d9;--b:#3b5b87"></button>
+      <button class="th-swatch"        data-theme="ruby"    title="Ruby"              style="--a:#f3d5d5;--b:#b83232"></button>
+    </div>
+
+    <!-- Status -->
+    <div class="sb-status" id="sb-status">
+      <span class="ss-dot white-dot"></span>
+      <span id="status-txt">White to move</span>
+    </div>
+
+    <!-- Move list -->
+    <div class="move-scroll">
+      <div class="move-grid" id="move-grid"></div>
+    </div>
+
+    <!-- Nav + game controls -->
+    <div class="nav-row">
+      <button class="nav-btn" id="nav-start" title="Go to start">⏮</button>
+      <button class="nav-btn" id="nav-prev"  title="Previous">◀</button>
+      <button class="nav-btn" id="nav-next"  title="Next">▶</button>
+      <button class="nav-btn" id="nav-end"   title="Go to end">⏭</button>
+    </div>
+    <div class="game-ctrl-row">
+      <button class="gc-btn danger" id="resign-btn">🏳 Resign</button>
+      <button class="gc-btn warn"   id="draw-btn">½ Draw</button>
+      <button class="gc-btn"        id="undo-btn">⟵ Undo</button>
+      <button class="gc-btn primary" id="new-game-btn">＋ New</button>
+    </div>
+
+    <!-- Extra -->
+    <div class="extra-row">
+      <button class="ex-btn" id="save-btn">💾 Save</button>
+      <button class="ex-btn" id="export-btn">📋 PGN</button>
+      <button class="ex-btn" id="fen-btn">🔗 FEN</button>
+      <button class="ex-btn" id="lib-btn">📚 Library</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+<div id="fen-modal"     class="modal"><div class="mc">
+  <span class="mc-close" data-modal="fen-modal">✕</span>
+  <h3>FEN Position</h3>
+  <textarea id="fen-input" class="mc-area" rows="3" placeholder="Paste FEN…"></textarea>
+  <div class="mc-row">
+    <button class="mc-btn" id="confirm-fen">Load</button>
+    <button class="mc-btn secondary" id="copy-fen">Copy current FEN</button>
+  </div>
+</div></div>
+
+<div id="save-modal"    class="modal"><div class="mc">
+  <span class="mc-close" data-modal="save-modal">✕</span>
+  <h3>Save Game</h3>
+  <input type="text" id="game-name" class="mc-inp" placeholder="Game name…">
+  <button class="mc-btn" id="confirm-save">Save</button>
+</div></div>
+
+<div id="library-modal" class="modal"><div class="mc wide">
+  <span class="mc-close" data-modal="library-modal">✕</span>
+  <h3>Game Library</h3>
+  <div id="lib-list" class="lib-list"></div>
+</div></div>
+
+<!-- Audio -->
+<audio id="snd-move"    src="chess/audio/move.mp3"    preload="auto"></audio>
+<audio id="snd-capture" src="chess/audio/capture.mp3" preload="auto"></audio>
+<audio id="snd-castle"  src="chess/audio/castle.mp3"  preload="auto"></audio>
+<audio id="snd-check"   src="chess/audio/check.mp3"   preload="auto"></audio>
+<audio id="snd-promote" src="chess/audio/promote.mp3" preload="auto"></audio>
+<audio id="snd-gameend" src="chess/audio/gameend.mp3" preload="auto"></audio>
+
+<script src="chess/Chess.js"></script>
+</body>
 </html>
