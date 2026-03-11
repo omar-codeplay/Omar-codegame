@@ -1,5 +1,9 @@
 /* ════════════════════════════════════════
-   CHESS.JS  — Full-featured local chess (Clean Version)
+   CHESS.JS  — Full-featured local chess
+   New features:
+   ✦ Asymmetric custom time (per player, in seconds)
+   ✦ Auto-flip after each move (toggle)
+   ✦ Fullscreen mode
    ════════════════════════════════════════ */
 
 'use strict';
@@ -17,7 +21,7 @@ const TIME_CONTROLS = {
     { label:'5+0',  min:5,  inc:0  },
     { label:'5+3',  min:5,  inc:3  },
     { label:'5+5',  min:5,  inc:5  },
-    { label:'10+0', min:10, inc:0  },
+    { label:'7+3',  min:7,  inc:3  },
   ],
   rapid:     [
     { label:'10+0', min:10, inc:0  },
@@ -58,16 +62,17 @@ class GameLibrary {
   _persist() { localStorage.setItem('chess_games_v2', JSON.stringify(this.games)); }
 }
 
-// ── CLOCK ──────────────────────────────────────────────────────────────────
+// ── CLOCK (supports asymmetric per-player time) ────────────────────────────
 class Clock {
-  constructor(seconds, increment) {
-    this.initial   = seconds;
-    this.increment = increment;
-    this.white     = seconds;
-    this.black     = seconds;
-    this.active    = null; // 'white' | 'black'
-    this._tid      = null;
-    this._last     = null;
+  constructor(whiteSecs, blackSecs, increment) {
+    this.whiteInitial = whiteSecs;
+    this.blackInitial = blackSecs;
+    this.increment    = increment;
+    this.white        = whiteSecs;
+    this.black        = blackSecs;
+    this.active       = null;
+    this._tid         = null;
+    this._last        = null;
   }
 
   start(color) {
@@ -83,73 +88,82 @@ class Clock {
   }
 
   switch(fromColor) {
-    if (this.increment > 0) this[fromColor] += this.increment;
+    const initial = fromColor === 'white' ? this.whiteInitial : this.blackInitial;
+    if (this.increment > 0 && initial > 0) this[fromColor] += this.increment;
     const nextColor = fromColor === 'white' ? 'black' : 'white';
     this.start(nextColor);
   }
 
   _tick() {
-    const now = Date.now();
-    const dt  = (now - this._last) / 1000;
+    const now  = Date.now();
+    const dt   = (now - this._last) / 1000;
     this._last = now;
-    if (this.active === 'white') this.white = Math.max(0, this.white - dt);
-    else if (this.active === 'black') this.black = Math.max(0, this.black - dt);
-    if (this[this.active] <= 0) {
-      this.stop();
-      if (window._gameActive) {
-        window._gameActive = false;
-        showResult(`timeout-${this.active}`);
+    const initial = this.active === 'white' ? this.whiteInitial : this.blackInitial;
+    if (initial > 0) {
+      this[this.active] = Math.max(0, this[this.active] - dt);
+      if (this[this.active] <= 0) {
+        this.stop();
+        if (window._gameActive) {
+          window._gameActive = false;
+          showResult(`timeout-${this.active}`);
+        }
       }
     }
   }
 
   fmt(color) {
-    if (this.initial === 0) return '∞';
-    const s = Math.ceil(this[color]);
-    const m = Math.floor(s / 60);
+    const initial = color === 'white' ? this.whiteInitial : this.blackInitial;
+    if (initial === 0) return '∞';
+    const s   = Math.ceil(this[color]);
+    const m   = Math.floor(s / 60);
     const sec = s % 60;
     return `${m}:${sec.toString().padStart(2,'0')}`;
   }
 
   isLow(color) {
-    return this.initial > 0 && this[color] < 30;
+    const initial = color === 'white' ? this.whiteInitial : this.blackInitial;
+    return initial > 0 && this[color] < 30;
   }
 }
 
-// ── GLOBAL VARIABLES ────────────────────────────────────────────────────────
+// ── GLOBAL VARIABLES ───────────────────────────────────────────────────────
 let _chess, _board, _clock, _lib;
-let _orientation  = 'white';
-let _theme        = 'green';
-let _selectedSq   = null;
-let _isDragging   = false;
-let _promoFrom    = null, _promoTo = null;
-let _gameActive   = false;
-let _moveHistory  = [];
-let _viewIdx      = -1;
-let _pWhite       = 'Player 1';
-let _pBlack       = 'Player 2';
-let _tc           = { label:'10+0', min:10, inc:0, category:'rapid' };
-let _clockTimer   = null;
+let _orientation    = 'white';
+let _theme          = 'green';
+let _selectedSq     = null;
+let _isDragging     = false;
+let _promoFrom      = null, _promoTo = null;
+let _gameActive     = false;
+let _moveHistory    = [];
+let _viewIdx        = -1;
+let _pWhite         = 'Player 1';
+let _pBlack         = 'Player 2';
+let _tc             = { label:'10+0', min:10, inc:0, category:'rapid' };
+let _clockTimer     = null;
 let _eventsAttached = false;
+let _autoFlip       = false;   // ← NEW: auto-flip toggle
 
-// Expose _gameActive for clock
-window._gameActive = _gameActive;
+window._gameActive  = _gameActive;
 
-// ── HELPER FUNCTIONS ───────────────────────────────────────────────────────
-const $ = (sel) => document.querySelector(sel);
+// ── HELPERS ────────────────────────────────────────────────────────────────
+const $  = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 
 function sqEl(sq) {
   return $(`#board .square-55d63[data-square="${sq}"]`);
 }
-
 function clearClass(cls) {
   $$(`#board .${cls}`).forEach(e => e.classList.remove(cls));
 }
-
 function catLabel(cat) {
   return { bullet:'Bullet', blitz:'Blitz', rapid:'Rapid', classical:'Classical',
            unlimited:'Unlimited', custom:'Custom' }[cat] || cat;
+}
+function fmtSecs(s) {
+  if (s === 0) return '∞';
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return sec > 0 ? `${m}:${sec.toString().padStart(2,'0')}` : `${m}m`;
 }
 
 // ── PIECE THEME ────────────────────────────────────────────────────────────
@@ -204,6 +218,23 @@ function renderTCOpts(cat) {
 function getCurrentTC() {
   const cat = $('.tc-tab.active')?.dataset.cat || 'rapid';
   if (cat === 'custom') {
+    const isAsym = $('#asymmetric-check')?.checked;
+    if (isAsym) {
+      const wSec = parseInt($('#custom-white-sec').value) || 90;
+      const bSec = parseInt($('#custom-black-sec').value) || 180;
+      const inc  = parseInt($('#custom-asym-inc').value)  || 0;
+      const wFmt = fmtSecs(wSec);
+      const bFmt = fmtSecs(bSec);
+      const incStr = inc > 0 ? `+${inc}` : '';
+      return {
+        label: `${wFmt} | ${bFmt}${incStr}`,
+        whiteSecs: wSec,
+        blackSecs: bSec,
+        inc,
+        category: 'custom',
+        asymmetric: true
+      };
+    }
     const min = parseInt($('#custom-min').value) || 0;
     const inc = parseInt($('#custom-inc').value) || 0;
     return { label: `${min}+${inc}`, min, inc, category:'custom' };
@@ -223,26 +254,36 @@ function getCurrentTC() {
       $('#custom-tc').style.display = cat === 'custom' ? 'block' : 'none';
     });
   });
+
+  // Asymmetric toggle
+  document.addEventListener('DOMContentLoaded', () => {
+    const chk = $('#asymmetric-check');
+    if (chk) {
+      chk.addEventListener('change', () => {
+        const asym = chk.checked;
+        $('#sym-fields').style.display  = asym ? 'none' : 'flex';
+        $('#asym-fields').style.display = asym ? 'block' : 'none';
+      });
+    }
+  });
+
   renderTCOpts('bullet');
 })();
 
-// ── GAME FUNCTIONS ──────────────────────────────────────────────────────────
-
+// ── GAME FUNCTIONS ─────────────────────────────────────────────────────────
 function launchGame(pWhite, pBlack, tc) {
   _pWhite = pWhite;
   _pBlack = pBlack;
   _tc     = tc;
   _lib    = _lib || new GameLibrary();
 
-  // Set names in UI
   $('#pname-white').textContent = pWhite;
   $('#pname-black').textContent = pBlack;
   $('#game-badge').textContent  = `${catLabel(tc.category)} · ${tc.label}`;
   $('#rs-white').textContent    = pWhite;
   $('#rs-black').textContent    = pBlack;
 
-  // Reset chess state
-  _chess = new Chess();
+  _chess       = new Chess();
   _moveHistory = [];
   _viewIdx     = -1;
   _gameActive  = true;
@@ -250,7 +291,9 @@ function launchGame(pWhite, pBlack, tc) {
   _selectedSq  = null;
   _isDragging  = false;
 
-  // Initialize board
+  // Clear piece-flip state
+  document.getElementById('board')?.classList.remove('pieces-flipped');
+
   if (_board) { _board.destroy(); _board = null; }
 
   _board = ChessBoard('board', {
@@ -265,17 +308,23 @@ function launchGame(pWhite, pBlack, tc) {
 
   window.addEventListener('resize', () => _board && _board.resize());
 
-  // Board click and touch handling
   const boardEl = $('#board');
   boardEl.onclick = null;
   boardEl.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
   boardEl.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
   boardEl.addEventListener('click', _onBoardClick);
 
-  // Clock
-  const secs = tc.min * 60;
-  _clock = new Clock(secs, tc.inc);
-  if (secs > 0) _clock.start('white');
+  // ── Clock: support asymmetric times ──
+  let whiteSecs, blackSecs;
+  if (tc.asymmetric) {
+    whiteSecs = tc.whiteSecs || 0;
+    blackSecs = tc.blackSecs || 0;
+  } else {
+    whiteSecs = blackSecs = (tc.min || 0) * 60;
+  }
+
+  _clock = new Clock(whiteSecs, blackSecs, tc.inc || 0);
+  if (whiteSecs > 0 || blackSecs > 0) _clock.start('white');
 
   if (_clockTimer) clearInterval(_clockTimer);
   _clockTimer = setInterval(_updateClocks, 100);
@@ -358,7 +407,7 @@ function _onBoardClick(e) {
     const piece = _chess.get(target);
     if (piece && piece.color === _chess.turn()) {
       _selectedSq = target;
-      sqEl(target)?.classList.add('sq-selected');
+      sqEl.classList.add('sq-selected');
       _showDots(target);
     }
   }
@@ -369,9 +418,10 @@ function _afterMove(move) {
   _viewIdx = -1;
   const mover = move.color === 'w' ? 'white' : 'black';
 
-  if (_clock && _clock.initial > 0) _clock.switch(mover);
+  if (_clock && (_clock.whiteInitial > 0 || _clock.blackInitial > 0)) {
+    _clock.switch(mover);
+  }
 
-  // Sound
   if      (_chess.in_checkmate())                                  playSound('gameend');
   else if (move.flags.includes('k') || move.flags.includes('q'))  playSound('castle');
   else if (move.promotion)                                         playSound('promote');
@@ -385,6 +435,14 @@ function _afterMove(move) {
   _renderMoveList();
   _scrollMoves();
 
+  // ── Auto-flip PIECES (rotate 180°) after each move ──
+  if (_autoFlip) {
+    const boardEl = document.getElementById('board');
+    // Black's turn → flip pieces so they face the black player
+    boardEl.classList.toggle('pieces-flipped', _chess.turn() === 'b' && !_chess.game_over());
+    if (_chess.game_over()) boardEl.classList.remove('pieces-flipped');
+  }
+
   if (_chess.game_over()) {
     _clock?.stop();
     _gameActive = false;
@@ -395,8 +453,8 @@ function _afterMove(move) {
 
 // ── PROMOTION ──────────────────────────────────────────────────────────────
 function _openPromo(color) {
-  const col   = color === 'w' ? 'white' : 'black';
-  const grid  = $('#promo-grid');
+  const col  = color === 'w' ? 'white' : 'black';
+  const grid = $('#promo-grid');
   grid.innerHTML = '';
   ['q','r','b','n'].forEach(p => {
     const btn = document.createElement('button');
@@ -525,9 +583,9 @@ function _renderMoveList() {
   grid.innerHTML = '';
 
   for (let i = 0; i < _moveHistory.length; i += 2) {
-    const num = Math.floor(i/2) + 1;
+    const num   = Math.floor(i/2) + 1;
     const numEl = document.createElement('div');
-    numEl.className = 'mg-num';
+    numEl.className  = 'mg-num';
     numEl.textContent = num + '.';
 
     const wEl = _mkMoveEl(i);
@@ -543,7 +601,7 @@ function _renderMoveList() {
 
 function _mkMoveEl(idx) {
   const el = document.createElement('div');
-  el.className = 'mg-move';
+  el.className  = 'mg-move';
   el.textContent = _moveHistory[idx].san;
   el.addEventListener('click', () => _gotoMove(idx));
   return el;
@@ -551,9 +609,7 @@ function _mkMoveEl(idx) {
 
 function _syncActive() {
   const active = _viewIdx === -1 ? _moveHistory.length - 1 : _viewIdx;
-  $$('.mg-move').forEach((el, i) => {
-    el.classList.toggle('active', i === active);
-  });
+  $$('.mg-move').forEach((el, i) => { el.classList.toggle('active', i === active); });
 }
 
 function _scrollMoves() {
@@ -629,6 +685,13 @@ function showResult(reason) {
   $('#result-title').textContent  = title;
   $('#result-reason').textContent = sub;
   $('#result-overlay').style.display = 'flex';
+
+  // ── Auto-save PGN to library ──
+  if (_moveHistory.length > 0) {
+    const date   = new Date().toLocaleString();
+    const name   = `${_pWhite} vs ${_pBlack} — ${date}`;
+    _lib.save(name, generatePGN(), _tc.label);
+  }
 }
 
 // ── PGN ────────────────────────────────────────────────────────────────────
@@ -671,7 +734,7 @@ function renderLibrary() {
         replay.move(m);
         _moveHistory.push({ san: m.san, from: m.from, to: m.to, fen: replay.fen(), move: m });
       });
-      _viewIdx = -1;
+      _viewIdx    = -1;
       _gameActive = false;
       window._gameActive = false;
       _clock?.stop();
@@ -691,11 +754,38 @@ function _attachGameEvents() {
   if (_eventsAttached) return;
   _eventsAttached = true;
 
+  // ── Flip board manually ──
   $('#flip-btn').addEventListener('click', () => {
     _orientation = _orientation === 'white' ? 'black' : 'white';
     _board.flip();
   });
 
+  // ── Auto-flip toggle ──
+  $('#autoflip-btn').addEventListener('click', () => {
+    _autoFlip = !_autoFlip;
+    const btn = $('#autoflip-btn');
+    btn.classList.toggle('icon-btn-active', _autoFlip);
+    btn.title = _autoFlip ? 'Auto-flip: ON (click to disable)' : 'Auto-flip after each move';
+  });
+
+  // ── Fullscreen ──
+  $('#fullscreen-btn').addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.();
+    }
+  });
+  document.addEventListener('fullscreenchange', () => {
+    const isFS = !!document.fullscreenElement;
+    const btn  = $('#fullscreen-btn');
+    if (btn) {
+      btn.textContent = isFS ? '⊡' : '⛶';
+      btn.title = isFS ? 'Exit Fullscreen' : 'Fullscreen';
+    }
+  });
+
+  // ── Theme ──
   $('#theme-btn').addEventListener('click', () => {
     const row = $('#theme-row');
     row.style.display = row.style.display === 'none' ? 'flex' : 'none';
@@ -711,19 +801,25 @@ function _attachGameEvents() {
     });
   });
 
+  // ── Navigation ──
   $('#nav-start').addEventListener('click', _navStart);
   $('#nav-prev' ).addEventListener('click', _navPrev);
   $('#nav-next' ).addEventListener('click', _navNext);
   $('#nav-end'  ).addEventListener('click', _navEnd);
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft')  { _navPrev(); e.preventDefault(); }
-    if (e.key === 'ArrowRight') { _navNext(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft')  { _navPrev();  e.preventDefault(); }
+    if (e.key === 'ArrowRight') { _navNext();  e.preventDefault(); }
     if (e.key === 'ArrowUp')    { _navStart(); e.preventDefault(); }
-    if (e.key === 'ArrowDown')  { _navEnd(); e.preventDefault(); }
-    if (e.key === 'f' || e.key === 'F') { _orientation = _orientation === 'white' ? 'black' : 'white'; _board.flip(); }
+    if (e.key === 'ArrowDown')  { _navEnd();   e.preventDefault(); }
+    if (e.key === 'f' || e.key === 'F') {
+      _orientation = _orientation === 'white' ? 'black' : 'white';
+      _board.flip();
+    }
+    if (e.key === 'F11') { e.preventDefault(); $('#fullscreen-btn')?.click(); }
   });
 
+  // ── Undo ──
   $('#undo-btn').addEventListener('click', () => {
     if (!_chess.history().length) return;
     _chess.undo();
@@ -734,6 +830,7 @@ function _attachGameEvents() {
     _renderMoveList();
   });
 
+  // ── Resign ──
   $('#resign-btn').addEventListener('click', () => {
     if (!_gameActive) return;
     if (!confirm('Resign this game?')) return;
@@ -743,6 +840,7 @@ function _attachGameEvents() {
     showResult(_chess.turn() === 'w' ? 'resign-white' : 'resign-black');
   });
 
+  // ── Draw ──
   $('#draw-btn').addEventListener('click', () => {
     if (!_gameActive) return;
     if (!confirm('Accept draw?')) return;
@@ -752,16 +850,17 @@ function _attachGameEvents() {
     showResult('draw-agreed');
   });
 
+  // ── New game ──
   $('#new-game-btn').addEventListener('click', () => {
     _clock?.stop();
-    $('#game-app').style.display    = 'none';
+    $('#game-app').style.display     = 'none';
     $('#setup-overlay').style.display = 'flex';
   });
 
   $('#ra-new').addEventListener('click', () => {
     $('#result-overlay').style.display = 'none';
     _clock?.stop();
-    $('#game-app').style.display    = 'none';
+    $('#game-app').style.display     = 'none';
     $('#setup-overlay').style.display = 'flex';
   });
 
@@ -770,6 +869,7 @@ function _attachGameEvents() {
     launchGame(_pWhite, _pBlack, _tc);
   });
 
+  // ── Save ──
   $('#save-btn').addEventListener('click', () => {
     $('#game-name').value = `${_pWhite} vs ${_pBlack}`;
     $('#save-modal').classList.add('show');
@@ -781,6 +881,7 @@ function _attachGameEvents() {
     $('#save-modal').classList.remove('show');
   });
 
+  // ── Export PGN ──
   $('#export-btn').addEventListener('click', () => {
     const blob = new Blob([generatePGN()], { type: 'text/plain' });
     const url  = URL.createObjectURL(blob);
@@ -789,6 +890,7 @@ function _attachGameEvents() {
     URL.revokeObjectURL(url);
   });
 
+  // ── FEN ──
   $('#fen-btn').addEventListener('click', () => {
     $('#fen-input').value = _chess.fen();
     $('#fen-modal').classList.add('show');
@@ -809,6 +911,7 @@ function _attachGameEvents() {
     $('#fen-input').value = _chess.fen();
   });
 
+  // ── Library ──
   $('#lib-btn').addEventListener('click', () => {
     renderLibrary();
     $('#library-modal').classList.add('show');
@@ -825,9 +928,19 @@ function _attachGameEvents() {
   });
 }
 
-// ── START BUTTON (唯一的事件绑定) ───────────────────────────────────────────
+// ── BOOT ───────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
   _lib = new GameLibrary();
+
+  // Asymmetric toggle init
+  const chk = $('#asymmetric-check');
+  if (chk) {
+    chk.addEventListener('change', () => {
+      const asym = chk.checked;
+      $('#sym-fields').style.display  = asym ? 'none' : 'flex';
+      $('#asym-fields').style.display = asym ? 'block' : 'none';
+    });
+  }
 
   $('#start-btn').addEventListener('click', () => {
     const pW = $('#name-white').value.trim() || 'Player 1';
