@@ -497,6 +497,63 @@ p {
     text-align: right;
 }
 
+.results-details hr {
+    margin: 20px 0;
+    border: none;
+    border-top: 2px solid #ddd;
+}
+
+.results-details h3 {
+    margin-top: 20px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.leaderboard-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+    font-size: 0.95em;
+}
+
+.leaderboard-table tr:last-child td {
+    border-bottom: none;
+}
+
+.leaderboard-table tr:hover {
+    background: #f9f9f9;
+}
+
+.result-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.result-buttons .btn-large {
+    flex: 1;
+    max-width: 200px;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
     .container {

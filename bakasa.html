@@ -35,6 +35,7 @@
                     <div class="category-buttons">
                         <button class="category-btn" data-category="food">🍕 أكل - Food</button>
                         <button class="category-btn" data-category="animals">🦁 حيوانات - Animals</button>
+                        <button class="category-btn" data-category="players">⚽ لاعبي كرة قدم - Football Players</button>
                     </div>
                 </div>
 
@@ -42,7 +43,7 @@
                     <label for="impostors-count">عدد الجواسيس (Number of Imposters):</label>
                     <div class="number-control">
                         <button id="impostors-minus" class="btn-small">−</button>
-                        <input type="number" id="impostors-count" value="1" min="1" max="5">
+                        <input type="number" id="impostors-count" value="1" min="1" max="10">
                         <button id="impostors-plus" class="btn-small">+</button>
                     </div>
                 </div>
@@ -99,7 +100,7 @@
             </div>
         </div>
 
-        <!-- Screen 6: Impostor Guessing -->
+        <!-- Screen 7: Impostor Guessing -->
         <div id="guess-screen" class="screen">
             <div class="guess-content">
                 <h2 id="guess-title"></h2>
@@ -108,12 +109,15 @@
             </div>
         </div>
 
-        <!-- Screen 7: Results -->
+        <!-- Screen 8: Results -->
         <div id="results-screen" class="screen">
             <div class="results-content">
                 <h2 id="game-result-title"></h2>
                 <div class="results-details" id="results-details"></div>
-                <button id="play-again-btn" class="btn-large">لعبة جديدة - Play Again</button>
+                <div class="result-buttons">
+                    <button id="new-round-btn" class="btn-large">جولة جديدة - New Round</button>
+                    <button id="play-again-btn" class="btn-large">لعبة جديدة - New Game</button>
+                </div>
             </div>
         </div>
     </div>
