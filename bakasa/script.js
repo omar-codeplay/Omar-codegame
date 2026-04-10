@@ -1,5 +1,5 @@
 // بكاسه - The Spy Game (Egyptian Edition)
-// Spy guesses the word from 4 options · Leaderboard by points only
+// Features: max spies = half players (rounded up), hidden random spy count, spies see each other
 
 (function(){
     // ---------- Egyptian Categories ----------
@@ -64,17 +64,21 @@
             this.secretWord = '';
             this.category = null;
             this.impostorCount = 1;
+            this.isRandomCount = false; // flag for hidden count
 
             this.revealOrder = [];
             this.currentRevealIdx = 0;
             this.votes = {};
             this.currentVoterIdx = 0;
             this.eliminatedIdx = null;
+            this.eliminatedIndices = [];
 
             this.currentImpostorGuessIdx = 0;
             this.guessOptions = [];
 
             this.points = {};
+
+            this.selectedVotes = new Set();
 
             this.bindEvents();
         }
@@ -125,6 +129,11 @@
 
             document.getElementById('impostors-minus').addEventListener('click', () => this.changeImpostors(-1));
             document.getElementById('impostors-plus').addEventListener('click', () => this.changeImpostors(1));
+            const randomBtn = document.getElementById('impostors-random');
+            if (randomBtn) {
+                randomBtn.addEventListener('click', () => this.setRandomImpostorCount());
+            }
+
             document.getElementById('game-start-btn').addEventListener('click', () => this.startGame());
 
             document.getElementById('card-reveal-btn').addEventListener('click', () => this.revealCard());
@@ -160,7 +169,10 @@
         }
 
         removePlayer(index) {
-            this.players.splice(index, 1);
+            const removed = this.players.splice(index, 1)[0];
+            if (removed && this.points.hasOwnProperty(removed.name)) {
+                delete this.points[removed.name];
+            }
             this.renderPlayersList();
             document.getElementById('names-done-btn').disabled = this.players.length < 2;
         }
@@ -177,19 +189,71 @@
 
         goToSetup() {
             if (this.players.length < 2) return;
+            const impostorInput = document.getElementById('impostors-count');
+            let val = parseInt(impostorInput.value, 10);
+            const maxSpies = Math.ceil(this.players.length / 2);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > maxSpies) val = maxSpies;
+            impostorInput.value = val;
+            impostorInput.max = maxSpies;
+            this.impostorCount = val;
+            this.isRandomCount = false;
             this.showScreen('setup-screen');
         }
 
         changeImpostors(delta) {
-            let val = parseInt(document.getElementById('impostors-count').value) + delta;
+            const input = document.getElementById('impostors-count');
+            let val = parseInt(input.value) + delta;
+            const maxSpies = Math.ceil(this.players.length / 2);
             if (val < 1) val = 1;
-            if (val > this.players.length) val = this.players.length;
-            document.getElementById('impostors-count').value = val;
+            if (val > maxSpies) val = maxSpies;
+            input.value = val;
             this.impostorCount = val;
+            this.isRandomCount = false;
+        }
+
+        setRandomImpostorCount() {
+            const maxSpies = Math.ceil(this.players.length / 2);
+            const randomCount = getRandomInt(1, maxSpies);
+            this.impostorCount = randomCount;
+            this.isRandomCount = true;
+            
+            // Hide the input field to conceal the count
+            const input = document.getElementById('impostors-count');
+            const parent = input.parentNode;
+            input.type = 'hidden';
+            
+            // Show a message that count is random and hidden
+            let msg = document.getElementById('random-spy-msg');
+            if (!msg) {
+                msg = document.createElement('span');
+                msg.id = 'random-spy-msg';
+                msg.style.marginRight = '10px';
+                msg.style.color = '#b45f1b';
+                msg.style.fontWeight = 'bold';
+                parent.appendChild(msg);
+            }
+            msg.innerText = `🎲 عدد الجواسيس مخفي (عشوائي)`;
+            
+            // Disable +/- buttons
+            document.getElementById('impostors-minus').disabled = true;
+            document.getElementById('impostors-plus').disabled = true;
         }
 
         startGame() {
             if (!this.category) return;
+            
+            // If count was hidden, keep it hidden; otherwise sync from input
+            if (!this.isRandomCount) {
+                const impostorInput = document.getElementById('impostors-count');
+                let desired = parseInt(impostorInput.value, 10);
+                const maxSpies = Math.ceil(this.players.length / 2);
+                if (isNaN(desired) || desired < 1) desired = 1;
+                if (desired > maxSpies) desired = maxSpies;
+                this.impostorCount = desired;
+                impostorInput.value = desired;
+            }
+            
             this.secretWord = getRandomItem(categories[this.category]);
 
             this.impostorIndices = [];
@@ -210,6 +274,7 @@
             this.currentVoterIdx = 0;
             this.currentImpostorGuessIdx = 0;
             this.eliminatedIdx = null;
+            this.eliminatedIndices = [];
 
             this.showCardRevealScreen();
         }
@@ -221,6 +286,8 @@
             document.getElementById('card-reveal-btn').classList.remove('hidden');
             document.getElementById('card-next-btn').classList.add('hidden');
             document.getElementById('card-inner').style.transform = 'rotateY(0deg)';
+            document.getElementById('role-display').innerHTML = '';
+            document.getElementById('word-display').innerHTML = '';
             this.showScreen('card-reveal-screen');
         }
 
@@ -229,13 +296,27 @@
             const player = this.players[idx];
             const roleDiv = document.getElementById('role-display');
             const wordDiv = document.getElementById('word-display');
+            
             if (player.role === 'impostor') {
-                roleDiv.innerHTML = '<h3>🕵️ أنت جاسوس!</h3>';
+                // Get names of other spies
+                const otherSpies = this.impostorIndices
+                    .filter(i => i !== idx)
+                    .map(i => this.players[i].name);
+                
+                let spyListHTML = '';
+                if (otherSpies.length > 0) {
+                    spyListHTML = `<p style="font-size:1rem; margin-top:10px;">🕵️ الجواسيس الآخرون: ${otherSpies.join('، ')}</p>`;
+                } else {
+                    spyListHTML = '<p style="font-size:1rem; margin-top:10px;">🕵️ أنت الجاسوس الوحيد</p>';
+                }
+                
+                roleDiv.innerHTML = '<h3>🕵️ أنت جاسوس!</h3>' + spyListHTML;
                 wordDiv.innerHTML = '<p style="font-size:1.3rem;">???</p>';
             } else {
                 roleDiv.innerHTML = '<h3>👨 مواطن</h3>';
                 wordDiv.innerHTML = '<p style="font-size:1.8rem; font-weight:bold;">' + this.secretWord + '</p>';
             }
+            
             document.getElementById('card-inner').style.transform = 'rotateY(180deg)';
             document.getElementById('card-reveal-btn').classList.add('hidden');
             document.getElementById('card-next-btn').classList.remove('hidden');
@@ -267,66 +348,136 @@
                 return;
             }
             const voter = this.players[this.currentVoterIdx];
-            document.getElementById('current-voter-text').innerHTML = voter.name + ' : من تريد إقصاءه؟';
+            const requiredVotes = this.impostorCount;
+            
+            document.getElementById('current-voter-text').innerHTML = 
+                `${voter.name} : اختر ${requiredVotes} مشتبه بهم (عدد الجواسيس)`;
+            
+            const feedbackEl = document.getElementById('vote-feedback');
+            if (feedbackEl) feedbackEl.innerHTML = '';
+            
+            this.selectedVotes.clear();
+            
             const container = document.getElementById('voting-options');
             container.innerHTML = this.players.map((p, i) => {
                 if (i !== this.currentVoterIdx) {
-                    return '<button class="vote-option" onclick="game.castVote(' + i + ')">' + p.name + '</button>';
+                    return `<button class="vote-option" data-index="${i}" onclick="game.toggleVoteSelection(${i})">${p.name}</button>`;
                 }
                 return '';
             }).join('');
+            
+            this.updateVoteSelectionStatus();
+            
             document.getElementById('voting-next-btn').classList.add('hidden');
             document.getElementById('voting-end-btn').classList.add('hidden');
             this.showScreen('voting-screen');
         }
 
-        castVote(votedIdx) {
-            this.votes[this.currentVoterIdx] = votedIdx;
+        toggleVoteSelection(index) {
+            const btn = document.querySelector(`.vote-option[data-index="${index}"]`);
+            if (!btn) return;
+            
+            if (this.selectedVotes.has(index)) {
+                this.selectedVotes.delete(index);
+                btn.style.background = '#3d2e1b';
+                btn.style.color = '#f0dbb0';
+            } else {
+                if (this.selectedVotes.size < this.impostorCount) {
+                    this.selectedVotes.add(index);
+                    btn.style.background = '#b45f1b';
+                    btn.style.color = 'white';
+                } else {
+                    return;
+                }
+            }
+            
+            this.updateVoteSelectionStatus();
+            
+            if (this.selectedVotes.size === this.impostorCount) {
+                document.getElementById('voting-next-btn').classList.remove('hidden');
+            } else {
+                document.getElementById('voting-next-btn').classList.add('hidden');
+            }
+        }
+
+        updateVoteSelectionStatus() {
+            const feedbackEl = document.getElementById('vote-feedback');
+            if (feedbackEl) {
+                const selectedNames = Array.from(this.selectedVotes).map(i => this.players[i].name).join('، ');
+                feedbackEl.innerHTML = `✔️ تم تحديد ${this.selectedVotes.size} من ${this.impostorCount}: ${selectedNames}`;
+                feedbackEl.style.color = '#b45f1b';
+                feedbackEl.style.fontWeight = 'bold';
+                feedbackEl.style.marginTop = '10px';
+            }
+        }
+
+        submitVotes() {
+            this.votes[this.currentVoterIdx] = Array.from(this.selectedVotes);
             document.querySelectorAll('.vote-option').forEach(btn => btn.disabled = true);
+            
             this.currentVoterIdx++;
             if (this.currentVoterIdx >= this.players.length) {
                 document.getElementById('voting-end-btn').classList.remove('hidden');
+                document.getElementById('voting-next-btn').classList.add('hidden');
             } else {
-                document.getElementById('voting-next-btn').classList.remove('hidden');
+                this.showVotingScreen();
             }
         }
 
         nextVoter() {
-            this.showVotingScreen();
+            if (this.selectedVotes.size !== this.impostorCount) {
+                alert(`يجب اختيار ${this.impostorCount} لاعبين بالضبط`);
+                return;
+            }
+            this.submitVotes();
         }
 
         endVoting() {
             if (Object.keys(this.votes).length < this.players.length) return;
+            
             const voteCount = new Array(this.players.length).fill(0);
-            Object.values(this.votes).forEach(v => voteCount[v]++);
-            let max = -1, eliminated = -1, ties = [];
-            for (let i = 0; i < voteCount.length; i++) {
-                if (voteCount[i] > max) {
-                    max = voteCount[i];
-                    eliminated = i;
-                    ties = [i];
-                } else if (voteCount[i] === max) {
-                    ties.push(i);
-                }
+            Object.values(this.votes).forEach(voteArray => {
+                voteArray.forEach(idx => voteCount[idx]++);
+            });
+            
+            const playersWithVotes = this.players.map((_, i) => ({ index: i, votes: voteCount[i] }));
+            playersWithVotes.sort((a, b) => b.votes - a.votes);
+            
+            const topVoteCount = playersWithVotes[0].votes;
+            const candidates = playersWithVotes.filter(p => p.votes === topVoteCount);
+            
+            const eliminateCount = Math.min(this.impostorCount, playersWithVotes.length);
+            let eliminatedIndices = [];
+            
+            if (candidates.length > eliminateCount) {
+                shuffleArray(candidates);
+                eliminatedIndices = candidates.slice(0, eliminateCount).map(c => c.index);
+            } else {
+                eliminatedIndices = playersWithVotes.slice(0, eliminateCount).map(p => p.index);
             }
-            if (ties.length > 1) {
-                eliminated = ties[Math.floor(Math.random() * ties.length)];
-            }
-            this.eliminatedIdx = eliminated;
+            
+            this.eliminatedIndices = eliminatedIndices;
+            this.eliminatedIdx = eliminatedIndices[0];
 
-            // Start spy guessing phase
+            // Survival bonus for impostors with 0 votes
+            this.impostorIndices.forEach(idx => {
+                if (voteCount[idx] === 0) {
+                    this.addPoint(this.players[idx].name);
+                }
+            });
+
             this.currentImpostorGuessIdx = 0;
             this.showImpostorGuessScreen();
         }
 
         showImpostorGuessScreen() {
-            const remainingImpostors = this.impostorIndices.filter(idx => idx !== this.eliminatedIdx);
-            if (this.currentImpostorGuessIdx >= remainingImpostors.length) {
+            if (this.currentImpostorGuessIdx >= this.impostorIndices.length) {
                 this.showFinalResults();
                 return;
             }
-            const impostorIdx = remainingImpostors[this.currentImpostorGuessIdx];
+            const impostorIdx = this.impostorIndices[this.currentImpostorGuessIdx];
             const impostorName = this.players[impostorIdx].name;
+            const isEliminated = this.eliminatedIndices.includes(impostorIdx);
 
             const wordList = categories[this.category];
             const otherWords = wordList.filter(w => w !== this.secretWord);
@@ -335,7 +486,10 @@
             shuffleArray(options);
             this.guessOptions = options;
 
-            document.getElementById('guess-title').innerHTML = impostorName + ' - خمّن الكلمة';
+            let title = impostorName + ' - خمّن الكلمة';
+            if (isEliminated) title += ' (تم إقصاؤك)';
+            document.getElementById('guess-title').innerHTML = title;
+
             const container = document.getElementById('guess-options');
             container.innerHTML = options.map(word => '<button class="guess-option" data-word="' + word + '">' + word + '</button>').join('');
             container.style.display = 'flex';
@@ -347,9 +501,8 @@
         }
 
         handleGuess(selectedWord) {
-            const remainingImpostors = this.impostorIndices.filter(idx => idx !== this.eliminatedIdx);
-            const currentImpostorIdx = remainingImpostors[this.currentImpostorGuessIdx];
-            const impostorName = this.players[currentImpostorIdx].name;
+            const impostorIdx = this.impostorIndices[this.currentImpostorGuessIdx];
+            const impostorName = this.players[impostorIdx].name;
 
             if (selectedWord === this.secretWord) {
                 this.addPoint(impostorName);
@@ -359,9 +512,12 @@
         }
 
         showFinalResults() {
-            // Removed the eliminated line as requested
             let html = '<p>🔑 الكلمة السرية: <strong style="font-size:1.4rem;">' + this.secretWord + '</strong></p>';
+            html += '<p>🕵️ عدد الجواسيس: ' + this.impostorCount + '</p>';
             html += '<p>🕵️ الجواسيس: ' + this.impostorIndices.map(i => this.players[i].name).join(', ') + '</p>';
+            if (this.eliminatedIndices.length > 0) {
+                html += '<p>❌ تم إقصاء: ' + this.eliminatedIndices.map(i => this.players[i].name).join('، ') + '</p>';
+            }
             html += '<hr><h3>🏆 جدول النقاط</h3>';
             html += this.getLeaderboardHTML();
             document.getElementById('game-result-title').innerHTML = '🎭 نهاية الجولة';
@@ -379,10 +535,21 @@
             this.currentVoterIdx = 0;
             this.currentImpostorGuessIdx = 0;
             this.eliminatedIdx = null;
+            this.eliminatedIndices = [];
             this.players.forEach(p => p.role = null);
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('impostors-count').value = 1;
+            
+            // Reset spy count input
+            const input = document.getElementById('impostors-count');
+            input.type = 'number';
+            input.value = 1;
             this.impostorCount = 1;
+            this.isRandomCount = false;
+            document.getElementById('impostors-minus').disabled = false;
+            document.getElementById('impostors-plus').disabled = false;
+            const msg = document.getElementById('random-spy-msg');
+            if (msg) msg.remove();
+            
             this.showScreen('setup-screen');
         }
 
@@ -397,12 +564,22 @@
             this.currentVoterIdx = 0;
             this.currentImpostorGuessIdx = 0;
             this.eliminatedIdx = null;
+            this.eliminatedIndices = [];
             document.getElementById('player-name-input').value = '';
             this.renderPlayersList();
             document.getElementById('names-done-btn').disabled = true;
             document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('impostors-count').value = 1;
+            
+            const input = document.getElementById('impostors-count');
+            input.type = 'number';
+            input.value = 1;
             this.impostorCount = 1;
+            this.isRandomCount = false;
+            document.getElementById('impostors-minus').disabled = false;
+            document.getElementById('impostors-plus').disabled = false;
+            const msg = document.getElementById('random-spy-msg');
+            if (msg) msg.remove();
+            
             this.showScreen('names-screen');
         }
     }

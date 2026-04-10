@@ -554,6 +554,11 @@ p {
     max-width: 200px;
 }
 
+.vote-option.selected {
+    background: #b45f1b !important;
+    color: white !important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 600px) {
     .container {
