@@ -414,6 +414,12 @@ body {
 
 @keyframes tick-pulse { from { opacity: .7 } to { opacity: 1 } }
 
+/* Rotate black player's clock 180° so it faces the top player */
+#clock-black {
+  transform: rotate(180deg);
+  transform-origin: center;
+}
+
 /* Board row */
 .board-row {
   display: flex;
