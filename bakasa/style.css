@@ -53,6 +53,7 @@ p {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -63,6 +64,7 @@ p {
     from {
         transform: rotateY(0deg);
     }
+
     to {
         transform: rotateY(180deg);
     }
@@ -379,7 +381,7 @@ p {
     margin-bottom: 10px;
 }
 
-.discussion-content > p {
+.discussion-content>p {
     font-size: 1.2em;
     color: #667eea;
 }
@@ -557,6 +559,124 @@ p {
 .vote-option.selected {
     background: #b45f1b !important;
     color: white !important;
+}
+
+/* Toggle Switch Styles */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background: #f0f2ff;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+.toggle-label {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #333;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked+.slider {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px #667eea;
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Grid layout for guess options */
+#guess-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.guess-option {
+    padding: 15px 20px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: 500;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.guess-option:hover {
+    border-color: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Mobile responsive for guess grid */
+@media (max-width: 600px) {
+    #guess-options {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .guess-option {
+        padding: 12px;
+        font-size: 1em;
+    }
+
+    .toggle-container {
+        flex-direction: column;
+        gap: 10px;
+    }
 }
 
 /* ===== RESPONSIVE ===== */
