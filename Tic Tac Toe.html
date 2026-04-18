@@ -1,70 +1,572 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tic Tac Toe</title>
-        <link rel="icon" href="image/logo-nobg.png"/>
-        <link rel="stylesheet" href="TicTacToe/Tic Tac Toe.css">
-        <script src="TicTacToe/Tic Tac Toe.js" defer></script>
-    </head>
-    <body>
-    <section class="main">
-        <noscript>
-            <p style="height: 100%; width: 100%; font-size: 4rem; display:flex;justify-content: center; align-items: center; ">
-            Sorry we cannot render this game without Javascript!<br> Please enable JavaScript to play the game</p>
-        </noscript>
-        <div class="result">
-            <p></p>
-        </div>
-    </section>
-    <section class="sidebar">
-        <aside>
-            <div class="upper-header">
-                <svg height="100%" width="100%">
-                    <rect x="0%" y="0%" width="100%" height="100%" style="fill:black;z-index: 1;" />
-                    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font-size:3rem; stroke:#0AF;stroke-width:0.5%;fill:#0AF;z-index: 2;">Play Against</text>
-                </svg>
-            </div>
-            <div class="upper">
-                <div class="left">
-                    <svg id="choice-ai-svg" height="100%" width="100%">
-                        <rect id="choice-ai-rect" x="0%" y="0%" width="100%" height="100%" style="stroke:#999;stroke-width:10%;fill:none;z-index: 1;" />
-                        <rect x="0%" y="0%" width="100%" height="100%" style="stroke:grey;stroke-width:2%;fill:none;z-index: 2;" />
-                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font-size:4rem; stroke:#0DF;stroke-width:1%;fill:#1EF;z-index: 3;">AI</text>
-                    </svg>
-                </div>
-                <div class="right">
-                    <svg id="choice-pvp-svg" height="100%" width="100%">
-                        <rect id="choice-pvp-rect" x="0%" y="0%" width="100%" height="100%" style="stroke:#999;stroke-width:2%;fill:none;z-index: 1;" />
-                        <rect x="0%" y="0%" width="100%" height="100%" style="stroke:grey;stroke-width:2%;fill:none;z-index: 2;" />
-                        <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font-size:4rem; stroke:#0DF;stroke-width:1%;fill:none;z-index: 3;">PvP</text>
-                    </svg>
-                </div>
-            </div>
-            <div class="lower-header">
-                <svg height="100%" width="100%">
-                    <rect x="0%" y="0%" width="100%" height="100%" style="fill:black;z-index: 1;" />
-                    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" style="font-size:3rem; stroke:#1E4;stroke-width:0.5%;fill:#1E4;z-index: 2;">Play As</text>
-                </svg>
-            </div>
-            <div class="lower">
-                <div class="left">
-                    <x-marker id="choice-x"></x-marker>
-                </div>
-                <div class="right">
-                    <o-marker id="choice-o"></o-marker>
-                </div>
-            </div>
-        </aside>
-        <a class="btn">
-            <span>
-                RESET
-            </span>
-            <span aria-hidden="true">
-                RESET
-            </span>
-        </a>
-    </section>
-    </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✦ BAKASA TIC-TAC-TOE ✦</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0a0a1a 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Arial', sans-serif;
+      padding: 20px;
+    }
+
+    .game-container {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* Main Board */
+    .board-section {
+      position: relative;
+    }
+
+    .board {
+      width: 500px;
+      height: 500px;
+      background: rgba(10, 15, 25, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 2px rgba(0, 255, 255, 0.2), 0 0 30px rgba(0, 255, 255, 0.3);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 12px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .cell {
+      background: rgba(0, 20, 40, 0.7);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.5), 0 4px 0 #0a1520, 0 0 0 1px rgba(0, 255, 255, 0.2);
+      position: relative;
+    }
+
+    .cell:hover:not(.filled) {
+      background: rgba(0, 150, 200, 0.2);
+      box-shadow: inset 0 -2px 0 cyan, 0 4px 0 #0a1520, 0 0 20px cyan;
+      transform: scale(1.02);
+    }
+
+    .cell.filled {
+      cursor: not-allowed;
+    }
+
+    /* X and O styling */
+    .cell[data-mark="X"]::before,
+    .cell[data-mark="X"]::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 80px;
+      background: linear-gradient(180deg, #00e5ff, #0088ff);
+      border-radius: 10px;
+      box-shadow: 0 0 20px #00e5ff, 0 0 40px #0088ff;
+    }
+
+    .cell[data-mark="X"]::before {
+      transform: rotate(45deg);
+    }
+
+    .cell[data-mark="X"]::after {
+      transform: rotate(-45deg);
+    }
+
+    .cell[data-mark="O"]::before {
+      content: '';
+      position: absolute;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 10px solid #ff44e6;
+      box-shadow: 0 0 20px #ff44e6, 0 0 40px #ff00c1, inset 0 0 10px #ff44e6;
+    }
+
+    /* Winner overlay */
+    .winner-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      border-radius: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.4s ease;
+      z-index: 10;
+      border: 2px solid cyan;
+      box-shadow: 0 0 50px cyan;
+    }
+
+    .winner-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .winner-text {
+      font-size: 4rem;
+      font-weight: bold;
+      background: linear-gradient(45deg, #00e5ff, #ff44e6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px cyan;
+      margin-bottom: 20px;
+      letter-spacing: 4px;
+    }
+
+    /* Control Panel */
+    .control-panel {
+      width: 300px;
+      background: rgba(10, 15, 25, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 30px 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 255, 255, 0.2), 0 0 30px rgba(0, 255, 255, 0.2);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .section-title {
+      color: #00e5ff;
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      text-shadow: 0 0 15px cyan;
+    }
+
+    .mode-selector, .mark-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .mode-btn, .mark-btn {
+      flex: 1;
+      padding: 15px 10px;
+      background: rgba(0, 20, 30, 0.8);
+      border: 2px solid rgba(0, 255, 255, 0.3);
+      border-radius: 15px;
+      color: #aaccff;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      box-shadow: 0 4px 0 #0a1520;
+    }
+
+    .mode-btn.active, .mark-btn.active {
+      background: rgba(0, 150, 200, 0.3);
+      border-color: #00e5ff;
+      color: white;
+      box-shadow: 0 0 20px cyan, 0 4px 0 #0a1520;
+      transform: translateY(-2px);
+    }
+
+    .mode-btn:hover, .mark-btn:hover {
+      background: rgba(0, 100, 150, 0.4);
+      border-color: #00e5ff;
+    }
+
+    .reset-btn {
+      width: 100%;
+      padding: 20px;
+      background: linear-gradient(135deg, #1a0a2a, #0a1a2a);
+      border: 2px solid #ff44e6;
+      border-radius: 20px;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 6px 0 #0a0a1a, 0 0 20px #ff44e6;
+      text-transform: uppercase;
+      letter-spacing: 6px;
+      margin-top: 20px;
+    }
+
+    .reset-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 9px 0 #0a0a1a, 0 0 30px #ff44e6;
+      background: linear-gradient(135deg, #2a0a3a, #0a2a3a);
+    }
+
+    .reset-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 3px 0 #0a0a1a, 0 0 30px #ff44e6;
+    }
+
+    .turn-indicator {
+      text-align: center;
+      margin: 20px 0;
+      padding: 15px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      color: #00e5ff;
+      font-size: 1.2rem;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .turn-mark {
+      font-size: 2rem;
+      font-weight: bold;
+      background: linear-gradient(45deg, #00e5ff, #ff44e6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Animation for cell placement */
+    @keyframes popIn {
+      0% { transform: scale(0); opacity: 0; }
+      80% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .cell[data-mark]::before,
+    .cell[data-mark]::after {
+      animation: popIn 0.2s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .board { width: 400px; height: 400px; }
+      .cell[data-mark="O"]::before { width: 55px; height: 55px; border-width: 8px; }
+      .cell[data-mark="X"]::before,
+      .cell[data-mark="X"]::after { width: 8px; height: 60px; }
+    }
+
+    @media (max-width: 700px) {
+      .game-container { flex-direction: column; }
+      .control-panel { width: 100%; max-width: 400px; }
+    }
+
+    /* Glow effects */
+    .glow-text {
+      text-shadow: 0 0 10px cyan;
+    }
+  </style>
+</head>
+<body>
+<div class="game-container">
+  <div class="board-section">
+    <div class="board">
+      <div class="grid" id="boardGrid"></div>
+    </div>
+    <div class="winner-overlay" id="winnerOverlay">
+      <div class="winner-text" id="winnerText"></div>
+    </div>
+  </div>
+
+  <div class="control-panel">
+    <div class="section-title">✦ GAME MODE ✦</div>
+    <div class="mode-selector">
+      <div class="mode-btn active" data-mode="ai">VS AI</div>
+      <div class="mode-btn" data-mode="pvp">VS HUMAN</div>
+    </div>
+
+    <div class="section-title">✦ PLAY AS ✦</div>
+    <div class="mark-selector">
+      <div class="mark-btn active" data-mark="X">✖ X</div>
+      <div class="mark-btn" data-mark="O">◉ O</div>
+    </div>
+
+    <div class="turn-indicator">
+      <div>Current Turn</div>
+      <div class="turn-mark" id="turnIndicator">X</div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn">⟳ RESET</button>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    // Game state
+    let board = ['', '', '', '', '', '', '', '', ''];
+    let currentPlayer = 'X';
+    let gameActive = true;
+    let gameMode = 'ai'; // 'ai' or 'pvp'
+    let playerMark = 'X'; // 'X' or 'O'
+    let aiMark = 'O';
+    let aiTimeout = null;
+
+    // DOM elements
+    const grid = document.getElementById('boardGrid');
+    const winnerOverlay = document.getElementById('winnerOverlay');
+    const winnerText = document.getElementById('winnerText');
+    const turnIndicator = document.getElementById('turnIndicator');
+    const modeBtns = document.querySelectorAll('.mode-btn');
+    const markBtns = document.querySelectorAll('.mark-btn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Winning combinations
+    const winPatterns = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+      [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+      [0, 4, 8], [2, 4, 6] // diagonals
+    ];
+
+    // Initialize board
+    function renderBoard() {
+      grid.innerHTML = '';
+      board.forEach((mark, index) => {
+        const cell = document.createElement('div');
+        cell.className = 'cell' + (mark ? ' filled' : '');
+        if (mark) cell.setAttribute('data-mark', mark);
+        cell.dataset.index = index;
+        cell.addEventListener('click', handleCellClick);
+        grid.appendChild(cell);
+      });
+      updateTurnIndicator();
+    }
+
+    // Handle cell click
+    function handleCellClick(e) {
+      const cell = e.currentTarget;
+      const index = parseInt(cell.dataset.index);
+
+      // Validate move
+      if (!gameActive) return;
+      if (board[index] !== '') return;
+      
+      // In AI mode, only allow player moves on their turn
+      if (gameMode === 'ai' && currentPlayer !== playerMark) return;
+
+      makeMove(index);
+    }
+
+    // Make a move
+    function makeMove(index) {
+      if (!gameActive) return;
+      if (board[index] !== '') return;
+
+      // Update board
+      board[index] = currentPlayer;
+      
+      // Update cell display
+      const cell = grid.children[index];
+      cell.className = 'cell filled';
+      cell.setAttribute('data-mark', currentPlayer);
+
+      // Check for winner
+      const winner = checkWinner();
+      
+      if (winner) {
+        endGame(winner === 'draw' ? 'draw' : winner);
+        return;
+      }
+
+      // Switch player
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      updateTurnIndicator();
+
+      // AI move
+      if (gameMode === 'ai' && gameActive && currentPlayer === aiMark) {
+        // Clear any pending AI move
+        if (aiTimeout) clearTimeout(aiTimeout);
+        aiTimeout = setTimeout(makeAIMove, 300);
+      }
+    }
+
+    // AI move using minimax
+    function makeAIMove() {
+      if (!gameActive || currentPlayer !== aiMark) return;
+
+      const bestMove = getBestMove();
+      if (bestMove !== -1) {
+        makeMove(bestMove);
+      }
+    }
+
+    // Minimax algorithm
+    function getBestMove() {
+      let bestScore = -Infinity;
+      let bestMove = -1;
+
+      for (let i = 0; i < 9; i++) {
+        if (board[i] === '') {
+          board[i] = aiMark;
+          let score = minimax(board, 0, false);
+          board[i] = '';
+          
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = i;
+          }
+        }
+      }
+
+      return bestMove;
+    }
+
+    function minimax(boardState, depth, isMaximizing) {
+      const result = checkWinnerOnBoard(boardState);
+      
+      if (result === aiMark) return 10 - depth;
+      if (result === (aiMark === 'X' ? 'O' : 'X')) return depth - 10;
+      if (result === 'draw') return 0;
+
+      if (isMaximizing) {
+        let best = -Infinity;
+        for (let i = 0; i < 9; i++) {
+          if (boardState[i] === '') {
+            boardState[i] = aiMark;
+            best = Math.max(best, minimax(boardState, depth + 1, false));
+            boardState[i] = '';
+          }
+        }
+        return best;
+      } else {
+        let best = Infinity;
+        const humanMark = aiMark === 'X' ? 'O' : 'X';
+        for (let i = 0; i < 9; i++) {
+          if (boardState[i] === '') {
+            boardState[i] = humanMark;
+            best = Math.min(best, minimax(boardState, depth + 1, true));
+            boardState[i] = '';
+          }
+        }
+        return best;
+      }
+    }
+
+    function checkWinnerOnBoard(boardState) {
+      for (let pattern of winPatterns) {
+        const [a, b, c] = pattern;
+        if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
+          return boardState[a];
+        }
+      }
+      
+      if (boardState.every(cell => cell !== '')) return 'draw';
+      return null;
+    }
+
+    function checkWinner() {
+      return checkWinnerOnBoard(board);
+    }
+
+    function endGame(result) {
+      gameActive = false;
+      
+      if (aiTimeout) {
+        clearTimeout(aiTimeout);
+        aiTimeout = null;
+      }
+
+      let message = '';
+      if (result === 'X') message = '✖ X WINS! ✖';
+      else if (result === 'O') message = '◉ O WINS! ◉';
+      else message = '⚡ DRAW ⚡';
+
+      winnerText.textContent = message;
+      winnerOverlay.classList.add('show');
+    }
+
+    function updateTurnIndicator() {
+      turnIndicator.textContent = currentPlayer;
+    }
+
+    // Reset game
+    function resetGame() {
+      // Clear AI timeout
+      if (aiTimeout) {
+        clearTimeout(aiTimeout);
+        aiTimeout = null;
+      }
+
+      // Reset state
+      board = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      gameActive = true;
+      
+      // Hide winner overlay
+      winnerOverlay.classList.remove('show');
+      
+      // Re-render board
+      renderBoard();
+
+      // If AI mode and AI goes first (player chose O)
+      if (gameMode === 'ai' && playerMark === 'O') {
+        aiMark = 'X';
+        currentPlayer = 'X';
+        updateTurnIndicator();
+        aiTimeout = setTimeout(makeAIMove, 300);
+      } else {
+        aiMark = playerMark === 'X' ? 'O' : 'X';
+      }
+    }
+
+    // Event listeners for mode selection
+    modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        modeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        gameMode = btn.dataset.mode;
+        resetGame();
+      });
+    });
+
+    // Event listeners for mark selection
+    markBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        markBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        playerMark = btn.dataset.mark;
+        aiMark = playerMark === 'X' ? 'O' : 'X';
+        resetGame();
+      });
+    });
+
+    // Reset button
+    resetBtn.addEventListener('click', resetGame);
+
+    // Close winner overlay on click
+    winnerOverlay.addEventListener('click', () => {
+      winnerOverlay.classList.remove('show');
+    });
+
+    // Initialize
+    renderBoard();
+
+    // Clean up timeouts on page unload
+    window.addEventListener('beforeunload', () => {
+      if (aiTimeout) clearTimeout(aiTimeout);
+    });
+  })();
+</script>
+</body>
 </html>
