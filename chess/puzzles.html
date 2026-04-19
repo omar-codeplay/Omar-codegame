@@ -1,20 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, touch-action: pan-y;">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, touch-action: pan-y">
   <title>Chess Puzzles · Live Lichess Database</title>
-  <meta name="description" content="Solve real tactical puzzles fetched live from Lichess.org. Fully interactive with console debugging.">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="description"
+    content="Solve real tactical puzzles fetched live from Lichess.org. Fully interactive with console debugging.">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Space Grotesk', sans-serif;
       background: #161512;
       color: #e8e4dc;
       min-height: 100vh;
     }
+
     :root {
       --bg: #161512;
       --surface: #1e1c19;
@@ -28,6 +39,7 @@
       --text2: #8a8278;
       --radius: 8px;
     }
+
     .header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -39,20 +51,61 @@
       top: 0;
       z-index: 100;
     }
-    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
     .logo-icon {
-      width: 36px; height: 36px;
+      width: 36px;
+      height: 36px;
       background: linear-gradient(135deg, #81b64c, #4f85c9);
       border-radius: 8px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 22px;
     }
-    .logo-text { font-size: 20px; font-weight: 700; color: var(--text); }
-    .logo-text span { color: var(--green); }
-    .nav-links { margin-left: auto; display: flex; gap: 6px; }
-    .nav-link { padding: 8px 14px; color: var(--text2); text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; }
-    .nav-link:hover { background: var(--border); color: var(--text); }
-    .nav-link.active { color: var(--green); background: rgba(129,182,76,0.1); }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .logo-text span {
+      color: var(--green);
+    }
+
+    .nav-links {
+      margin-left: auto;
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav-link {
+      padding: 8px 14px;
+      color: var(--text2);
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .nav-link.active {
+      color: var(--green);
+      background: rgba(129, 182, 76, 0.1);
+    }
+
     .puzzle-container {
       display: grid;
       grid-template-columns: 1fr 360px;
@@ -61,122 +114,335 @@
       margin: 0 auto;
       padding: 24px 20px;
     }
-    .board-column { display: flex; flex-direction: column; gap: 14px; }
+
+    .board-column {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
     .board-wrapper {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      /* Prevent touch scrolling on board */
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
       touch-action: none;
     }
-    #puzzleBoard { 
-      width: 100% !important; 
-      max-width: 560px; 
-      margin: 0 auto; 
+
+    #puzzleBoard {
+      width: 100% !important;
+      max-width: 560px;
+      margin: 0 auto;
       touch-action: none;
     }
+
     .status-bar {
-      display: flex; gap: 10px; align-items: center;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 11px 16px;
-      font-family: 'Courier Prime', monospace; font-size: 13px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 11px 16px;
+      font-family: 'Courier Prime', monospace;
+      font-size: 13px;
       flex-wrap: wrap;
     }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text2); transition: background 0.3s; }
-    .status-dot.success { background: var(--green); box-shadow: 0 0 8px rgba(129,182,76,0.6); }
-    .status-dot.error { background: var(--red); }
-    .status-dot.info { background: var(--yellow); }
-    .status-dot.loading { background: var(--blue); animation: pulse 1s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    #statusText { flex: 1; }
-    .sidebar { display: flex; flex-direction: column; gap: 14px; }
-    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-    .card-title { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text2); margin-bottom: 12px; }
-    .puzzle-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
-    .puzzle-id { font-family: 'Courier Prime', monospace; font-size: 11px; color: var(--text2); word-break: break-all; }
-    .rating-badge { background: rgba(244,193,67,0.12); color: var(--yellow); border: 1px solid rgba(244,193,67,0.25); padding: 3px 10px; border-radius: 16px; font-family: 'Courier Prime', monospace; font-size: 13px; font-weight: 700; }
-    .theme-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
-    .theme-tag { background: rgba(79,133,201,0.12); border: 1px solid var(--border); color: var(--blue); padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500; }
-    .progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 7px; }
-    .progress-bar-bg { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-    .progress-bar-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.4s ease; }
-    .action-row { display: flex; gap: 8px; margin-top: 8px; }
-    .btn { flex: 1; padding: 10px 0; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s; }
-    .btn:hover { border-color: var(--green); color: var(--text); background: rgba(129,182,76,0.08); }
-    .btn-primary { background: var(--green); color: #111; border-color: var(--green); font-weight: 700; }
-    .btn-primary:hover { background: #6a9a3e; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .filter-section { margin-bottom: 12px; }
-    .filter-row { margin-bottom: 10px; }
-    .filter-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; }
-    .slider-row { display: flex; align-items: center; gap: 10px; }
-    #ratingSlider { flex: 1; }
-    .slider-val { font-family: 'Courier Prime', monospace; font-size: 13px; color: var(--yellow); min-width: 45px; }
-    .console-badge { font-size: 10px; background: #2c2a27; padding: 2px 8px; border-radius: 12px; cursor: pointer; }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text2);
+      transition: background 0.3s;
+    }
+
+    .status-dot.success {
+      background: var(--green);
+      box-shadow: 0 0 8px rgba(129, 182, 76, 0.6);
+    }
+
+    .status-dot.error {
+      background: var(--red);
+    }
+
+    .status-dot.info {
+      background: var(--yellow);
+    }
+
+    .status-dot.loading {
+      background: var(--blue);
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.4;
+      }
+    }
+
+    #statusText {
+      flex: 1;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text2);
+      margin-bottom: 12px;
+    }
+
+    .puzzle-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .puzzle-id {
+      font-family: 'Courier Prime', monospace;
+      font-size: 11px;
+      color: var(--text2);
+      word-break: break-all;
+    }
+
+    .rating-badge {
+      background: rgba(244, 193, 67, 0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(244, 193, 67, 0.25);
+      padding: 3px 10px;
+      border-radius: 16px;
+      font-family: 'Courier Prime', monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .theme-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 12px;
+    }
+
+    .theme-tag {
+      background: rgba(79, 133, 201, 0.12);
+      border: 1px solid var(--border);
+      color: var(--blue);
+      padding: 3px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 7px;
+    }
+
+    .progress-bar-bg {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 0;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .btn:hover {
+      border-color: var(--green);
+      color: var(--text);
+      background: rgba(129, 182, 76, 0.08);
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #111;
+      border-color: var(--green);
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: #6a9a3e;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .filter-section {
+      margin-bottom: 12px;
+    }
+
+    .filter-row {
+      margin-bottom: 10px;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      color: var(--text2);
+      margin-bottom: 5px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #ratingSlider {
+      flex: 1;
+    }
+
+    .slider-val {
+      font-family: 'Courier Prime', monospace;
+      font-size: 13px;
+      color: var(--yellow);
+      min-width: 45px;
+    }
+
+    .console-badge {
+      font-size: 10px;
+      background: #2c2a27;
+      padding: 2px 8px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 2px;
+    }
+
     @media (max-width: 800px) {
-      .puzzle-container { grid-template-columns: 1fr; padding: 12px; }
-      .nav-links { display: none; }
+      .puzzle-container {
+        grid-template-columns: 1fr;
+        padding: 12px;
+      }
+
+      .nav-links {
+        display: none;
+      }
     }
   </style>
 </head>
-<body>
-<header class="header">
-  <a href="#" class="logo">
-    <div class="logo-icon">♞</div>
-    <div class="logo-text">Chess<span>Master</span></div>
-  </a>
-  <div class="nav-links">
-    <a class="nav-link">Home</a>
-    <a class="nav-link active">Puzzles</a>
-    <a class="nav-link">Practice</a>
-    <a class="nav-link">Editor</a>
-  </div>
-</header>
-<div class="puzzle-container">
-  <div class="board-column">
-    <div class="board-wrapper" id="boardWrapper"><div id="puzzleBoard"></div></div>
-    <div class="status-bar">
-      <div class="status-dot" id="statusDot"></div>
-      <span id="statusText">Connecting to Lichess...</span>
-      <span class="console-badge" id="consoleToggle" title="Open browser console (F12) for debug logs">🐞 Console</span>
-    </div>
-    <!-- Move History Card REMOVED (it showed solution) -->
-  </div>
-  <div class="sidebar">
-    <div class="card">
-      <div class="puzzle-meta">
-        <span class="puzzle-id" id="puzzleId">—</span>
-        <span class="rating-badge" id="puzzleRating">—</span>
-      </div>
-      <div class="progress-row"><span id="progressLabel">Move 0 of 0</span><span id="progressPct">0%</span></div>
-      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
-      <div class="theme-tags" id="puzzleThemes"></div>
-    </div>
-    <div class="card">
-  <div class="card-title">Training Filters</div>
-  
-  <div class="filter-row">
-    <div class="filter-label">Theme</div>
-    <select id="themeSelect" class="btn" style="width: 100%; margin-bottom: 10px;">
-      <option value="all">All Themes</option>
-      <option value="mate">Checkmate</option>
-      <option value="fork">Fork</option>
-      <option value="pin">Pin</option>
-      <option value="endgame">Endgame</option>
-      <option value="advantage">Advantage</option>
-    </select>
-  </div>
 
-  <div class="filter-row">
-    <div class="filter-label">Rating: <span id="ratingValue">1400</span></div>
-    <input type="range" id="ratingSlider" min="600" max="2600" value="1400" step="50" style="width: 100%;">
-  </div>
-</div>
+<body>
+  <header class="header">
+    <a href="#" class="logo">
+      <div class="logo-icon">♞</div>
+      <div class="logo-text">Chess<span>Master</span></div>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link">Home</a>
+      <a class="nav-link active">Puzzles</a>
+      <a class="nav-link">Practice</a>
+      <a class="nav-link">Editor</a>
+    </div>
+  </header>
+  <div class="puzzle-container">
+    <div class="board-column">
+      <div class="board-wrapper" id="boardWrapper">
+        <div id="puzzleBoard"></div>
+      </div>
+      <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">Connecting to Lichess...</span>
+        <span class="console-badge" id="consoleToggle" title="Open browser console (F12) for debug logs">🐞
+          Console</span>
+      </div>
+    </div>
+    <div class="sidebar">
+      <div class="card">
+        <div class="puzzle-meta">
+          <span class="puzzle-id" id="puzzleId">—</span>
+          <span class="rating-badge" id="puzzleRating">—</span>
+        </div>
+        <div class="progress-row"><span id="progressLabel">Move 0 of 0</span><span id="progressPct">0%</span></div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="theme-tags" id="puzzleThemes"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Training Filters</div>
+
+        <div class="filter-row">
+          <div class="filter-label">Theme</div>
+          <select id="themeSelect" class="btn" style="width: 100%; margin-bottom: 10px;">
+            <option value="all">All Themes</option>
+            <option value="mate">Checkmate</option>
+            <option value="fork">Fork</option>
+            <option value="pin">Pin</option>
+            <option value="endgame">Endgame</option>
+            <option value="advantage">Advantage</option>
+          </select>
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-label">Rating: <span id="ratingValue">1400</span></div>
+          <input type="range" id="ratingSlider" min="600" max="2600" value="1400" step="50" style="width: 100%;">
+        </div>
+      </div>
 
       <div class="action-row">
         <button class="btn" id="hintBtn">💡 Hint</button>
@@ -186,213 +452,275 @@
       </div>
     </div>
   </div>
-</div>
+  </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
 
-<script>
-// ============================================================
-// ULTIMATE MULTI-FILE PUZZLE TRAINER
-// ============================================================
+  <script>
+    // ============================================================
+    // SOUNDS - Using your original Audio objects
+    // ============================================================
 
-let masterBank = [];
-let currentPuzzle = null;
-let game = new Chess();
-let board = null;
-let solutionMoves = [];
-let expectedMoveIndex = 0;
-let waitingForMove = false;
+    const sounds = {
+      move: new Audio('audio/move.mp3'),
+      capture: new Audio('audio/capture.mp3'),
+      castle: new Audio('audio/castle.mp3'),
+      check: new Audio('audio/check.mp3'),
+      gameEnd: new Audio('audio/game-end.mp3'),
+      error: new Audio('audio/move.mp3')
+    };
 
-// Settings
-let targetRating = 1200; // Starting point
-let targetTheme = 'all';
-const RATING_STEP = 25; // How much harder it gets after a win
+    // Pre-load all sounds
+    Object.values(sounds).forEach(sound => {
+      sound.load();
+      sound.volume = 0.5;
+    });
 
-// --- DATABASE LOADER (The "Scan" Logic) ---
+    let audioUnlocked = false;
 
-async function initDatabase() {
-    updateStatus("Scanning for puzzle files...", "loading");
-    
-    let partNumber = 1;
-    let keepScanning = true;
-    const loadedData = [];
-
-    // This loop checks puzzles_part_1.json, then _2, etc. until it fails
-    while (keepScanning && partNumber <= 20) { // Safety cap at 20 files (40k puzzles)
-        try {
-            const fileName = `puzzles_part_${partNumber}.json`;
-            const response = await fetch(fileName);
-            
-            if (!response.ok) {
-                keepScanning = false; // No more files found
-            } else {
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    loadedData.push(...data);
-                    console.log(`[LOADER] Found and loaded ${fileName}`);
-                    partNumber++;
-                } else {
-                    keepScanning = false;
-                }
-            }
-        } catch (e) {
-            keepScanning = false; // Stop if we hit a 404
-        }
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      Object.values(sounds).forEach(sound => {
+        sound.play().then(() => {
+          sound.pause();
+          sound.currentTime = 0;
+        }).catch(() => { });
+      });
+      audioUnlocked = true;
     }
 
-    if (loadedData.length > 0) {
+    function playSnd(name) {
+      if (!audioUnlocked) unlockAudio();
+      const sound = sounds[name];
+      if (sound) {
+        sound.currentTime = 0;
+        sound.play().catch(e => console.log("Audio play blocked:", e));
+      }
+    }
+
+    // Unlock on any user interaction
+    document.body.addEventListener('mousedown', unlockAudio);
+    document.body.addEventListener('touchstart', unlockAudio);
+    document.body.addEventListener('click', unlockAudio);
+
+    // ============================================================
+    // PUZZLE LOGIC
+    // ============================================================
+
+    let masterBank = [];
+    let currentPuzzle = null;
+    let game = new Chess();
+    let board = null;
+    let solutionMoves = [];
+    let expectedMoveIndex = 0;
+    let waitingForMove = false;
+
+    let targetRating = 1400;
+    let targetTheme = 'all';
+    const RATING_STEP = 25;
+
+    async function initDatabase() {
+      updateStatus("Scanning for puzzle files...", "loading");
+
+      let partNumber = 1;
+      let keepScanning = true;
+      const loadedData = [];
+
+      while (keepScanning && partNumber <= 20) {
+        try {
+          const fileName = `puzzles_part_${partNumber}.json`;
+          const response = await fetch(fileName);
+
+          if (!response.ok) {
+            keepScanning = false;
+          } else {
+            const data = await response.json();
+            if (data && data.length > 0) {
+              loadedData.push(...data);
+              console.log(`[LOADER] Found and loaded ${fileName}`);
+              partNumber++;
+            } else {
+              keepScanning = false;
+            }
+          }
+        } catch (e) {
+          keepScanning = false;
+        }
+      }
+
+      if (loadedData.length > 0) {
         masterBank = loadedData;
         updateStatus(`Database Ready: ${masterBank.length} puzzles`, "success");
         loadPuzzle();
-    } else {
+      } else {
         updateStatus("Error: No puzzles found. Run Python script!", "error");
+      }
     }
-}
 
-// --- CORE GAMEPLAY ---
+    function loadPuzzle() {
+      if (masterBank.length === 0) return;
 
-function loadPuzzle() {
-    if (masterBank.length === 0) return;
-    
-    waitingForMove = false;
-    document.getElementById('nextBtn').disabled = true;
+      waitingForMove = false;
+      document.getElementById('nextBtn').disabled = true;
 
-    // 1. Filter by Rating and Theme
-    // We look for puzzles within 200 points of our target
-    let filtered = masterBank.filter(p => {
+      let filtered = masterBank.filter(p => {
         const ratingMatch = Math.abs(p.Rating - targetRating) <= 200;
-        const themeMatch = targetTheme === 'all' || 
-            (p.Themes && p.Themes.some(t => t.toLowerCase().includes(targetTheme)));
+        const themeMatch = targetTheme === 'all' ||
+          (p.Themes && p.Themes.some(t => t.toLowerCase().includes(targetTheme)));
         return ratingMatch && themeMatch;
-    });
+      });
 
-    // Fallback if no specific theme match exists at that rating
-    if (filtered.length === 0) {
+      if (filtered.length === 0) {
         filtered = masterBank.filter(p => Math.abs(p.Rating - targetRating) <= 500);
-    }
+      }
 
-    const raw = filtered[Math.floor(Math.random() * filtered.length)];
-    
-    // 2. Setup Logic
-    game = new Chess(raw.FEN);
-    const uciMoves = raw.Moves.split(' ');
-    solutionMoves = [];
-    let temp = new Chess(raw.FEN);
-    for (const uci of uciMoves) {
+      const raw = filtered[Math.floor(Math.random() * filtered.length)];
+
+      game = new Chess(raw.FEN);
+      const uciMoves = raw.Moves.split(' ');
+      solutionMoves = [];
+      let temp = new Chess(raw.FEN);
+      for (const uci of uciMoves) {
         let m = temp.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || 'q' });
         if (m) solutionMoves.push(m.san);
-    }
+      }
 
-    const playerColor = game.turn() === 'w' ? 'black' : 'white';
-    currentPuzzle = { id: raw.PuzzleId, rating: raw.Rating, themes: raw.Themes || [], fen: raw.FEN };
-    expectedMoveIndex = 0;
+      const playerColor = game.turn() === 'w' ? 'black' : 'white';
+      currentPuzzle = { id: raw.PuzzleId, rating: raw.Rating, themes: raw.Themes || [], fen: raw.FEN };
+      expectedMoveIndex = 0;
 
-    // 3. Board Update
-    const config = {
+      const config = {
         position: game.fen(),
         pieceTheme: 'https://lichess1.org/assets/piece/cburnett/{piece}.svg',
         onDrop: handleMove,
         draggable: true,
         orientation: playerColor
-    };
+      };
 
-    if (!board) board = Chessboard('puzzleBoard', config);
-    else { board.orientation(playerColor); board.position(game.fen()); }
+      if (!board) board = Chessboard('puzzleBoard', config);
+      else { board.orientation(playerColor); board.position(game.fen()); }
 
-    updateUI();
-    updateStatus(`Opponent blundered! Find the win (Rated ${raw.Rating})`, 'info');
+      updateUI();
+      updateStatus(`Opponent blundered! Find the win (Rated ${raw.Rating})`, 'info');
 
-    // Play initial blunder move
-    setTimeout(() => {
+      setTimeout(() => {
         game.move(solutionMoves[0]);
         board.position(game.fen());
         expectedMoveIndex = 1;
         waitingForMove = true;
         updateProgress();
-    }, 800);
+        playSnd('move');
+      }, 800);
 
-    document.getElementById('nextBtn').disabled = false;
-}
+      document.getElementById('nextBtn').disabled = false;
+    }
 
-function handleMove(source, target) {
-    if (!waitingForMove) return 'snapback';
-    const move = game.move({ from: source, to: target, promotion: 'q' });
-    if (!move) return 'snapback';
+    function handleMove(source, target) {
+      if (!waitingForMove) return 'snapback';
 
-    if (move.san === solutionMoves[expectedMoveIndex]) {
+      const targetPiece = game.get(target);
+      const isCapture = !!targetPiece;
+
+      const move = game.move({ from: source, to: target, promotion: 'q' });
+      if (!move) return 'snapback';
+
+      if (isCapture) {
+        playSnd('capture');
+      } else if (move.flags.includes('k') || move.flags.includes('q')) {
+        playSnd('castle');
+      } else {
+        playSnd('move');
+      }
+
+      if (game.in_check()) {
+        playSnd('check');
+      }
+
+      if (move.san === solutionMoves[expectedMoveIndex]) {
         expectedMoveIndex++;
         board.position(game.fen());
-        
+
         if (expectedMoveIndex >= solutionMoves.length) {
-            // SUCCESS: Increment Difficulty!
-            targetRating += RATING_STEP;
-            updateStatus(`✓ BRILLIANT! Rating increased to ${targetRating}`, 'success');
-            waitingForMove = false;
-            syncUI(); 
+          targetRating += RATING_STEP;
+          // CHANGED: Show puzzle name instead of rating
+          updateStatus(`✓ SOLVED! "${currentPuzzle.id}" completed!`, 'success');
+          waitingForMove = false;
+          playSnd('gameEnd');
+          syncUI();
+          updateProgress();
         } else {
-            waitingForMove = false;
-            setTimeout(() => {
-                game.move(solutionMoves[expectedMoveIndex]);
-                board.position(game.fen());
-                expectedMoveIndex++;
-                waitingForMove = true;
-                updateProgress();
-            }, 600);
+          waitingForMove = false;
+          setTimeout(() => {
+            game.move(solutionMoves[expectedMoveIndex]);
+            board.position(game.fen());
+            expectedMoveIndex++;
+            waitingForMove = true;
+            updateProgress();
+            playSnd('move');
+            if (game.in_check()) playSnd('check');
+          }, 600);
         }
-    } else {
+      } else {
         game.undo();
-        updateStatus('✘ Incorrect. Rating stays same.', 'error');
+        updateStatus('✘ Incorrect. Keep trying!', 'error');
+        playSnd('error');
         return 'snapback';
+      }
+      updateProgress();
     }
-    updateProgress();
-}
 
-// --- UI HELPERS ---
+    function updateStatus(msg, type) {
+      const statusText = document.getElementById('statusText');
+      const statusDot = document.getElementById('statusDot');
+      statusText.innerText = msg;
+      statusDot.className = `status-dot ${type}`;
+    }
 
-function updateStatus(msg, type) {
-    const statusText = document.getElementById('statusText');
-    const statusDot = document.getElementById('statusDot');
-    statusText.innerText = msg;
-    statusDot.className = `status-dot ${type}`;
-}
+    function syncUI() {
+      document.getElementById('ratingSlider').value = targetRating;
+      document.getElementById('ratingValue').innerText = targetRating;
+    }
 
-function syncUI() {
-    // Keeps the HTML slider and label in sync with the internal difficulty
-    document.getElementById('ratingSlider').value = targetRating;
-    document.getElementById('ratingValue').innerText = targetRating;
-}
+    function updateUI() {
+      document.getElementById('puzzleId').innerText = `ID: ${currentPuzzle.id}`;
+      document.getElementById('puzzleRating').innerText = `⭐ ${currentPuzzle.rating}`;
+      document.getElementById('puzzleThemes').innerHTML =
+        currentPuzzle.themes.slice(0, 3).map(t => `<span class="theme-tag">${t}</span>`).join('');
+    }
 
-function updateUI() {
-    document.getElementById('puzzleId').innerText = `ID: ${currentPuzzle.id}`;
-    document.getElementById('puzzleRating').innerText = `⭐ ${currentPuzzle.rating}`;
-    document.getElementById('puzzleThemes').innerHTML = 
-        currentPuzzle.themes.slice(0,3).map(t => `<span class="theme-tag">${t}</span>`).join('');
-}
+    function updateProgress() {
+      if (solutionMoves.length === 0) return;
+      const pct = (expectedMoveIndex / solutionMoves.length) * 100;
+      document.getElementById('progressFill').style.width = `${pct}%`;
+      document.getElementById('progressLabel').innerText = `Move ${expectedMoveIndex} of ${solutionMoves.length}`;
+      document.getElementById('progressPct').innerText = `${Math.floor(pct)}%`;
+    }
 
-function updateProgress() {
-    const pct = (expectedMoveIndex / solutionMoves.length) * 100;
-    document.getElementById('progressFill').style.width = `${pct}%`;
-}
+    document.getElementById('ratingSlider').oninput = (e) => {
+      targetRating = parseInt(e.target.value);
+      document.getElementById('ratingValue').innerText = targetRating;
+    };
 
-// --- LISTENERS ---
+    document.getElementById('themeSelect').onchange = (e) => {
+      targetTheme = e.target.value;
+      loadPuzzle();
+    };
 
-document.getElementById('ratingSlider').oninput = (e) => {
-    targetRating = parseInt(e.target.value);
-    document.getElementById('ratingValue').innerText = targetRating;
-};
+    document.getElementById('nextBtn').onclick = loadPuzzle;
+    document.getElementById('resetBtn').onclick = () => { if (currentPuzzle) loadPuzzle(); };
+    document.getElementById('hintBtn').onclick = () => {
+      if (waitingForMove && solutionMoves[expectedMoveIndex]) {
+        updateStatus(`Hint: Try ${solutionMoves[expectedMoveIndex]}`, 'info');
+      } else {
+        updateStatus('No hint available right now', 'error');
+      }
+    };
+    document.getElementById('solveBtn').onclick = () => { if (currentPuzzle) loadPuzzle(); };
 
-document.getElementById('themeSelect').onchange = (e) => {
-    targetTheme = e.target.value;
-    loadPuzzle();
-};
-
-document.getElementById('nextBtn').onclick = loadPuzzle;
-
-// Start the app
-initDatabase();
-
-</script>
+    initDatabase();
+  </script>
 </body>
+
 </html>
