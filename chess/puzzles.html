@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Chess Puzzles · Real Lichess Database</title>
-  <meta name="description" content="Train with real tactical puzzles fetched directly from Lichess.org API. Thousands of curated positions.">
-  <link rel="icon" href="https://lichess.org/assets/logo/lichess-favicon-32x32.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, touch-action: pan-y;">
+  <title>Chess Puzzles · Live Lichess Database</title>
+  <meta name="description" content="Solve real tactical puzzles fetched live from Lichess.org. Fully interactive with console debugging.">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
   <style>
@@ -15,7 +14,6 @@
       background: #161512;
       color: #e8e4dc;
       min-height: 100vh;
-      overflow-x: hidden;
     }
     :root {
       --bg: #161512;
@@ -70,8 +68,15 @@
       border-radius: 12px;
       padding: 16px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      /* Prevent touch scrolling on board */
+      touch-action: none;
     }
-    #puzzleBoard { width: 100% !important; max-width: 560px; margin: 0 auto; }
+    #puzzleBoard { 
+      width: 100% !important; 
+      max-width: 560px; 
+      margin: 0 auto; 
+      touch-action: none;
+    }
     .status-bar {
       display: flex; gap: 10px; align-items: center;
       background: var(--surface); border: 1px solid var(--border);
@@ -79,7 +84,7 @@
       font-family: 'Courier Prime', monospace; font-size: 13px;
       flex-wrap: wrap;
     }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text2); flex-shrink: 0; transition: background 0.3s; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text2); transition: background 0.3s; }
     .status-dot.success { background: var(--green); box-shadow: 0 0 8px rgba(129,182,76,0.6); }
     .status-dot.error { background: var(--red); }
     .status-dot.info { background: var(--yellow); }
@@ -89,39 +94,27 @@
     .sidebar { display: flex; flex-direction: column; gap: 14px; }
     .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
     .card-title { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--text2); margin-bottom: 12px; }
-    .puzzle-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .puzzle-id { font-family: 'Courier Prime', monospace; font-size: 12px; color: var(--text2); }
+    .puzzle-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+    .puzzle-id { font-family: 'Courier Prime', monospace; font-size: 11px; color: var(--text2); word-break: break-all; }
     .rating-badge { background: rgba(244,193,67,0.12); color: var(--yellow); border: 1px solid rgba(244,193,67,0.25); padding: 3px 10px; border-radius: 16px; font-family: 'Courier Prime', monospace; font-size: 13px; font-weight: 700; }
     .theme-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
     .theme-tag { background: rgba(79,133,201,0.12); border: 1px solid var(--border); color: var(--blue); padding: 3px 10px; border-radius: 16px; font-size: 11px; font-weight: 500; }
     .progress-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 7px; }
     .progress-bar-bg { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
     .progress-bar-fill { height: 100%; background: var(--green); border-radius: 2px; transition: width 0.4s ease; }
-    .filter-section { display: flex; flex-direction: column; gap: 14px; }
-    .filter-row { display: flex; flex-direction: column; gap: 7px; }
-    .filter-label { font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text2); }
-    .pill-grid { display: flex; flex-wrap: wrap; gap: 5px; }
-    .pill { padding: 5px 12px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 12px; font-weight: 500; cursor: pointer; transition: 0.15s; }
-    .pill:hover { border-color: var(--green); color: var(--text); }
-    .pill.active { border-color: var(--green); background: rgba(129,182,76,0.12); color: var(--green); }
-    .slider-row { display: flex; align-items: center; gap: 12px; }
-    input[type=range] { flex: 1; -webkit-appearance: none; height: 5px; background: var(--border); border-radius: 3px; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--green); cursor: pointer; }
-    .slider-val { font-family: 'Courier Prime', monospace; font-size: 14px; font-weight: 700; color: var(--yellow); min-width: 40px; text-align: right; }
-    .action-row { display: flex; gap: 8px; }
+    .action-row { display: flex; gap: 8px; margin-top: 8px; }
     .btn { flex: 1; padding: 10px 0; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface2); color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s; }
     .btn:hover { border-color: var(--green); color: var(--text); background: rgba(129,182,76,0.08); }
     .btn-primary { background: var(--green); color: #111; border-color: var(--green); font-weight: 700; }
     .btn-primary:hover { background: #6a9a3e; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .move-grid { display: flex; flex-direction: column; gap: 2px; max-height: 120px; overflow-y: auto; }
-    .move-row { display: grid; grid-template-columns: 28px 1fr 1fr; gap: 4px; font-family: 'Courier Prime', monospace; font-size: 12px; padding: 3px 6px; border-radius: 4px; }
-    .move-row:nth-child(even) { background: var(--surface2); }
-    .move-num { color: var(--text2); }
+    .filter-section { margin-bottom: 12px; }
+    .filter-row { margin-bottom: 10px; }
+    .filter-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    #ratingSlider { flex: 1; }
+    .slider-val { font-family: 'Courier Prime', monospace; font-size: 13px; color: var(--yellow); min-width: 45px; }
     .console-badge { font-size: 10px; background: #2c2a27; padding: 2px 8px; border-radius: 12px; cursor: pointer; }
-    .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-    .loading-spinner { width: 48px; height: 48px; border: 3px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -146,32 +139,52 @@
 </header>
 <div class="puzzle-container">
   <div class="board-column">
-    <div class="board-wrapper"><div id="puzzleBoard"></div></div>
+    <div class="board-wrapper" id="boardWrapper"><div id="puzzleBoard"></div></div>
     <div class="status-bar">
       <div class="status-dot" id="statusDot"></div>
-      <span id="statusText">Connecting to Lichess API...</span>
+      <span id="statusText">Connecting to Lichess...</span>
       <span class="console-badge" id="consoleToggle" title="Open browser console (F12) for debug logs">🐞 Console</span>
     </div>
-    <div class="card"><div class="card-title">Move History</div><div class="move-grid" id="moveHistory">—</div></div>
+    <!-- Move History Card REMOVED (it showed solution) -->
   </div>
   <div class="sidebar">
     <div class="card">
-      <div class="puzzle-meta"><span class="puzzle-id" id="puzzleId">—</span><span class="rating-badge" id="puzzleRating">—</span></div>
+      <div class="puzzle-meta">
+        <span class="puzzle-id" id="puzzleId">—</span>
+        <span class="rating-badge" id="puzzleRating">—</span>
+      </div>
       <div class="progress-row"><span id="progressLabel">Move 0 of 0</span><span id="progressPct">0%</span></div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
       <div class="theme-tags" id="puzzleThemes"></div>
     </div>
     <div class="card">
-      <div class="card-title">Lichess Filters</div>
-      <div class="filter-section">
-        <div class="filter-row"><div class="filter-label">Target Rating</div>
-          <div class="slider-row"><input type="range" id="ratingSlider" min="600" max="2500" value="1400" step="50"><span class="slider-val" id="ratingValue">1400</span></div>
-          <div class="pill-grid"><div class="pill" data-type="rating" data-val="800">Beginner</div><div class="pill active" data-type="rating" data-val="1400">Intermediate</div><div class="pill" data-type="rating" data-val="1900">Advanced</div><div class="pill" data-type="rating" data-val="2400">Expert</div></div>
-        </div>
-        <div class="filter-row"><div class="filter-label">Theme</div><div class="pill-grid" id="themeFilter"><div class="pill active" data-type="theme" data-val="">Any</div><div class="pill" data-type="theme" data-val="fork">Fork</div><div class="pill" data-type="theme" data-val="pin">Pin</div><div class="pill" data-type="theme" data-val="skewer">Skewer</div><div class="pill" data-type="theme" data-val="discoveredAttack">Discovery</div><div class="pill" data-type="theme" data-val="sacrifice">Sacrifice</div><div class="pill" data-type="theme" data-val="backRankMate">Back Rank</div><div class="pill" data-type="theme" data-val="endgame">Endgame</div><div class="pill" data-type="theme" data-val="mate">Mate</div></div></div>
+  <div class="card-title">Training Filters</div>
+  
+  <div class="filter-row">
+    <div class="filter-label">Theme</div>
+    <select id="themeSelect" class="btn" style="width: 100%; margin-bottom: 10px;">
+      <option value="all">All Themes</option>
+      <option value="mate">Checkmate</option>
+      <option value="fork">Fork</option>
+      <option value="pin">Pin</option>
+      <option value="endgame">Endgame</option>
+      <option value="advantage">Advantage</option>
+    </select>
+  </div>
+
+  <div class="filter-row">
+    <div class="filter-label">Rating: <span id="ratingValue">1400</span></div>
+    <input type="range" id="ratingSlider" min="600" max="2600" value="1400" step="50" style="width: 100%;">
+  </div>
+</div>
+
+      <div class="action-row">
+        <button class="btn" id="hintBtn">💡 Hint</button>
+        <button class="btn" id="resetBtn">↻ Reset</button>
+        <button class="btn" id="solveBtn">👁 Solve</button>
+        <button class="btn btn-primary" id="nextBtn">Next →</button>
       </div>
     </div>
-    <div class="card"><div class="action-row"><button class="btn" id="hintBtn">💡 Hint</button><button class="btn" id="resetBtn">↻ Reset</button><button class="btn" id="solveBtn">👁 Solve</button><button class="btn btn-primary" id="nextBtn">Next →</button></div></div>
   </div>
 </div>
 
@@ -181,378 +194,205 @@
 
 <script>
 // ============================================================
-// REAL LICHESS API INTEGRATION - Fetch puzzles live
+// ULTIMATE MULTI-FILE PUZZLE TRAINER
 // ============================================================
-const DEBUG = true;
-function logInfo(msg, data) { if (DEBUG) { if (data) console.log(`[INFO] ${msg}`, data); else console.log(`[INFO] ${msg}`); } }
-function logError(msg, err) { console.error(`[ERROR] ${msg}`, err || ''); }
-function logWarn(msg) { console.warn(`[WARN] ${msg}`); }
 
-// Lichess Puzzle API endpoint (public, no auth required)
-const LICHESS_PUZZLE_API = 'https://lichess.org/api/puzzle/random';
-
-// Global state
-let currentPuzzleData = null;
+let masterBank = [];
+let currentPuzzle = null;
 let game = new Chess();
 let board = null;
 let solutionMoves = [];
 let expectedMoveIndex = 0;
-let waitingForMove = true;
-let isLoading = false;
+let waitingForMove = false;
 
-// DOM elements
-const puzzleIdEl = document.getElementById('puzzleId');
-const puzzleRatingEl = document.getElementById('puzzleRating');
-const puzzleThemesEl = document.getElementById('puzzleThemes');
-const statusDot = document.getElementById('statusDot');
-const statusTextEl = document.getElementById('statusText');
-const progressLabel = document.getElementById('progressLabel');
-const progressPct = document.getElementById('progressPct');
-const progressFill = document.getElementById('progressFill');
-const moveHistoryDiv = document.getElementById('moveHistory');
-const ratingSlider = document.getElementById('ratingSlider');
-const ratingValue = document.getElementById('ratingValue');
-const nextBtn = document.getElementById('nextBtn');
-const resetBtn = document.getElementById('resetBtn');
-const solveBtn = document.getElementById('solveBtn');
-const hintBtn = document.getElementById('hintBtn');
+// Settings
+let targetRating = 1200; // Starting point
+let targetTheme = 'all';
+const RATING_STEP = 25; // How much harder it gets after a win
 
-let activeFilters = { rating: 1400, theme: '' };
+// --- DATABASE LOADER (The "Scan" Logic) ---
 
-// ============================================================
-// FETCH PUZZLE FROM LICHESS API
-// ============================================================
-async function fetchPuzzleFromLichess() {
-  return new Promise((resolve, reject) => {
-    logInfo(`Fetching puzzle from Lichess API...`);
-    fetch(LICHESS_PUZZLE_API, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    })
-    .then(response => {
-      logInfo(`API response status: ${response.status}`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return response.json();
-    })
-    .then(data => {
-      logInfo(`Lichess API response received`, { id: data.puzzle.id, rating: data.puzzle.rating });
-      resolve(data);
-    })
-    .catch(error => {
-      logError(`Failed to fetch from Lichess`, error);
-      reject(error);
+async function initDatabase() {
+    updateStatus("Scanning for puzzle files...", "loading");
+    
+    let partNumber = 1;
+    let keepScanning = true;
+    const loadedData = [];
+
+    // This loop checks puzzles_part_1.json, then _2, etc. until it fails
+    while (keepScanning && partNumber <= 20) { // Safety cap at 20 files (40k puzzles)
+        try {
+            const fileName = `puzzles_part_${partNumber}.json`;
+            const response = await fetch(fileName);
+            
+            if (!response.ok) {
+                keepScanning = false; // No more files found
+            } else {
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    loadedData.push(...data);
+                    console.log(`[LOADER] Found and loaded ${fileName}`);
+                    partNumber++;
+                } else {
+                    keepScanning = false;
+                }
+            }
+        } catch (e) {
+            keepScanning = false; // Stop if we hit a 404
+        }
+    }
+
+    if (loadedData.length > 0) {
+        masterBank = loadedData;
+        updateStatus(`Database Ready: ${masterBank.length} puzzles`, "success");
+        loadPuzzle();
+    } else {
+        updateStatus("Error: No puzzles found. Run Python script!", "error");
+    }
+}
+
+// --- CORE GAMEPLAY ---
+
+function loadPuzzle() {
+    if (masterBank.length === 0) return;
+    
+    waitingForMove = false;
+    document.getElementById('nextBtn').disabled = true;
+
+    // 1. Filter by Rating and Theme
+    // We look for puzzles within 200 points of our target
+    let filtered = masterBank.filter(p => {
+        const ratingMatch = Math.abs(p.Rating - targetRating) <= 200;
+        const themeMatch = targetTheme === 'all' || 
+            (p.Themes && p.Themes.some(t => t.toLowerCase().includes(targetTheme)));
+        return ratingMatch && themeMatch;
     });
-  });
-}
 
-// Parse Lichess puzzle format to get solution moves
-function parseLichessPuzzle(puzzleJson) {
-  try {
-    const puzzle = puzzleJson.puzzle;
-    const gameObj = puzzleJson.game;
-    
-    // Lichess provides FEN and a sequence of moves in UCI format
-    const fen = puzzle.fen;
-    const rating = puzzle.rating;
-    const themes = puzzle.themes || [];
-    const solutionUCI = puzzle.solution || [];
-    
-    // Convert UCI moves to SAN for display and validation
-    const tempGame = new Chess(fen);
-    const sanMoves = [];
-    for (const uciMove of solutionUCI) {
-      const move = tempGame.move({ from: uciMove.slice(0,2), to: uciMove.slice(2,4), promotion: uciMove[4] || 'q' });
-      if (move) {
-        sanMoves.push(move.san);
-      } else {
-        logWarn(`Could not convert UCI ${uciMove} to SAN`);
-      }
+    // Fallback if no specific theme match exists at that rating
+    if (filtered.length === 0) {
+        filtered = masterBank.filter(p => Math.abs(p.Rating - targetRating) <= 500);
     }
-    
-    logInfo(`Parsed puzzle: ${sanMoves.length} solution moves`, { fen, rating, themes, sanMoves });
-    
-    return {
-      id: puzzle.id,
-      fen: fen,
-      rating: rating,
-      themes: themes.slice(0, 5),
-      solutionMoves: sanMoves,
-      initialTurn: tempGame.turn()
-    };
-  } catch (err) {
-    logError(`Parse error`, err);
-    throw err;
-  }
-}
 
-// ============================================================
-// LOAD AND DISPLAY PUZZLE
-// ============================================================
-async function loadPuzzle() {
-  if (isLoading) {
-    logWarn(`Already loading a puzzle, skipping`);
-    return;
-  }
-  
-  isLoading = true;
-  setStatus('Fetching fresh puzzle from Lichess...', 'loading');
-  statusDot.className = 'status-dot loading';
-  nextBtn.disabled = true;
-  
-  try {
-    const rawData = await fetchPuzzleFromLichess();
-    const parsed = parseLichessPuzzle(rawData);
+    const raw = filtered[Math.floor(Math.random() * filtered.length)];
     
-    // Apply rating filter client-side (Lichess random gives any rating)
-    const targetRating = activeFilters.rating;
-    const ratingDiff = Math.abs(parsed.rating - targetRating);
-    if (ratingDiff > 400) {
-      logInfo(`Rating diff ${ratingDiff} > 400, fetching another...`);
-      // Recursive fetch for better match (max 3 attempts)
-      const retryData = await fetchPuzzleFromLichess();
-      const retryParsed = parseLichessPuzzle(retryData);
-      if (Math.abs(retryParsed.rating - targetRating) < ratingDiff || retryParsed.rating <= targetRating + 300) {
-        Object.assign(parsed, retryParsed);
-      }
+    // 2. Setup Logic
+    game = new Chess(raw.FEN);
+    const uciMoves = raw.Moves.split(' ');
+    solutionMoves = [];
+    let temp = new Chess(raw.FEN);
+    for (const uci of uciMoves) {
+        let m = temp.move({ from: uci.slice(0, 2), to: uci.slice(2, 4), promotion: uci[4] || 'q' });
+        if (m) solutionMoves.push(m.san);
     }
-    
-    // Apply theme filter (if selected, try to match - Lichess returns themes)
-    if (activeFilters.theme && !parsed.themes.includes(activeFilters.theme)) {
-      logInfo(`Theme mismatch (${activeFilters.theme} not in ${parsed.themes.join(',')}), fetching alternative...`);
-      const themeAttempt = await fetchPuzzleFromLichess();
-      const themeParsed = parseLichessPuzzle(themeAttempt);
-      if (themeParsed.themes.includes(activeFilters.theme)) {
-        Object.assign(parsed, themeParsed);
-      }
-    }
-    
-    // Apply puzzle
-    currentPuzzleData = parsed;
-    solutionMoves = parsed.solutionMoves;
-    game = new Chess(parsed.fen);
+
+    const playerColor = game.turn() === 'w' ? 'black' : 'white';
+    currentPuzzle = { id: raw.PuzzleId, rating: raw.Rating, themes: raw.Themes || [], fen: raw.FEN };
     expectedMoveIndex = 0;
-    waitingForMove = true;
-    
-    logInfo(`Puzzle loaded successfully`, { id: parsed.id, rating: parsed.rating, moves: solutionMoves });
-    
-    // Initialize or update board
-    if (!board) {
-      const config = {
+
+    // 3. Board Update
+    const config = {
         position: game.fen(),
         pieceTheme: 'https://lichess1.org/assets/piece/cburnett/{piece}.svg',
         onDrop: handleMove,
-        draggable: true
-      };
-      board = Chessboard('puzzleBoard', config);
-      logInfo(`Board initialized`);
-    } else {
-      board.position(game.fen());
-    }
-    
+        draggable: true,
+        orientation: playerColor
+    };
+
+    if (!board) board = Chessboard('puzzleBoard', config);
+    else { board.orientation(playerColor); board.position(game.fen()); }
+
     updateUI();
-    renderMoveHistory();
-    const turn = game.turn() === 'w' ? 'White' : 'Black';
-    setStatus(`${turn} to move. Solve the Lichess tactic!`, 'info');
-    statusDot.className = 'status-dot info';
-    
-  } catch (error) {
-    logError(`Failed to load puzzle`, error);
-    setStatus(`Error loading from Lichess: ${error.message}. Check console.`, 'error');
-    statusDot.className = 'status-dot error';
-  } finally {
-    isLoading = false;
-    nextBtn.disabled = false;
-  }
-}
+    updateStatus(`Opponent blundered! Find the win (Rated ${raw.Rating})`, 'info');
 
-// ============================================================
-// MOVE HANDLER - With detailed logging
-// ============================================================
-function handleMove(source, target) {
-  logInfo(`Move attempt: ${source} → ${target}`, { waitingForMove, expectedMoveIndex, totalMoves: solutionMoves.length });
-  
-  if (!waitingForMove) {
-    logWarn(`Move rejected: puzzle already solved`);
-    return 'snapback';
-  }
-  
-  const move = game.move({ from: source, to: target, promotion: 'q' });
-  if (!move) {
-    logWarn(`Invalid move: ${source}-${target} not legal`);
-    return 'snapback';
-  }
-  
-  logInfo(`Move executed: ${move.san}`);
-  board.position(game.fen());
-  
-  const userSan = move.san;
-  const expectedSan = solutionMoves[expectedMoveIndex];
-  
-  if (userSan === expectedSan) {
-    expectedMoveIndex++;
-    updateProgress();
-    renderMoveHistory();
-    
-    if (expectedMoveIndex >= solutionMoves.length) {
-      logInfo(`🎉 PUZZLE SOLVED!`);
-      setStatus('✓ Perfect! Puzzle solved! Get next puzzle.', 'success');
-      statusDot.className = 'status-dot success';
-      waitingForMove = false;
-    } else {
-      logInfo(`Correct! Next: ${solutionMoves[expectedMoveIndex]}`);
-      setStatus(`✔ Correct! Next: ${solutionMoves[expectedMoveIndex]}`, 'success');
-      statusDot.className = 'status-dot success';
-    }
-  } else {
-    game.undo();
-    board.position(game.fen());
-    logError(`Wrong move: ${userSan} vs expected ${expectedSan}`);
-    setStatus(`✘ Wrong. Expected ${expectedSan}`, 'error');
-    statusDot.className = 'status-dot error';
+    // Play initial blunder move
     setTimeout(() => {
-      if (waitingForMove && statusDot.className === 'status-dot error') {
-        setStatus('Try again.', 'info');
-        statusDot.className = 'status-dot info';
-      }
-    }, 1200);
-  }
-  return undefined;
+        game.move(solutionMoves[0]);
+        board.position(game.fen());
+        expectedMoveIndex = 1;
+        waitingForMove = true;
+        updateProgress();
+    }, 800);
+
+    document.getElementById('nextBtn').disabled = false;
 }
 
-// ============================================================
-// UI FUNCTIONS
-// ============================================================
+function handleMove(source, target) {
+    if (!waitingForMove) return 'snapback';
+    const move = game.move({ from: source, to: target, promotion: 'q' });
+    if (!move) return 'snapback';
+
+    if (move.san === solutionMoves[expectedMoveIndex]) {
+        expectedMoveIndex++;
+        board.position(game.fen());
+        
+        if (expectedMoveIndex >= solutionMoves.length) {
+            // SUCCESS: Increment Difficulty!
+            targetRating += RATING_STEP;
+            updateStatus(`✓ BRILLIANT! Rating increased to ${targetRating}`, 'success');
+            waitingForMove = false;
+            syncUI(); 
+        } else {
+            waitingForMove = false;
+            setTimeout(() => {
+                game.move(solutionMoves[expectedMoveIndex]);
+                board.position(game.fen());
+                expectedMoveIndex++;
+                waitingForMove = true;
+                updateProgress();
+            }, 600);
+        }
+    } else {
+        game.undo();
+        updateStatus('✘ Incorrect. Rating stays same.', 'error');
+        return 'snapback';
+    }
+    updateProgress();
+}
+
+// --- UI HELPERS ---
+
+function updateStatus(msg, type) {
+    const statusText = document.getElementById('statusText');
+    const statusDot = document.getElementById('statusDot');
+    statusText.innerText = msg;
+    statusDot.className = `status-dot ${type}`;
+}
+
+function syncUI() {
+    // Keeps the HTML slider and label in sync with the internal difficulty
+    document.getElementById('ratingSlider').value = targetRating;
+    document.getElementById('ratingValue').innerText = targetRating;
+}
+
 function updateUI() {
-  if (!currentPuzzleData) return;
-  puzzleIdEl.innerText = currentPuzzleData.id.slice(0, 12) + '...';
-  puzzleRatingEl.innerText = currentPuzzleData.rating;
-  const displayThemes = currentPuzzleData.themes.slice(0, 5);
-  puzzleThemesEl.innerHTML = displayThemes.map(t => `<span class="theme-tag">${t.replace(/_/g, ' ')}</span>`).join('');
-  updateProgress();
+    document.getElementById('puzzleId').innerText = `ID: ${currentPuzzle.id}`;
+    document.getElementById('puzzleRating').innerText = `⭐ ${currentPuzzle.rating}`;
+    document.getElementById('puzzleThemes').innerHTML = 
+        currentPuzzle.themes.slice(0,3).map(t => `<span class="theme-tag">${t}</span>`).join('');
 }
 
 function updateProgress() {
-  const total = solutionMoves.length;
-  const done = expectedMoveIndex;
-  progressLabel.innerText = `Move ${done} of ${total}`;
-  const percent = total ? (done / total) * 100 : 0;
-  progressFill.style.width = `${percent}%`;
-  progressPct.innerText = `${Math.round(percent)}%`;
+    const pct = (expectedMoveIndex / solutionMoves.length) * 100;
+    document.getElementById('progressFill').style.width = `${pct}%`;
 }
 
-function renderMoveHistory() {
-  if (!solutionMoves.length) { moveHistoryDiv.innerHTML = '<div>—</div>'; return; }
-  let html = '';
-  for (let i = 0; i < solutionMoves.length; i++) {
-    const isPlayed = i < expectedMoveIndex;
-    const style = isPlayed ? 'color: var(--green);' : 'color: var(--text2);';
-    const checkmark = isPlayed ? ' ✓' : '';
-    html += `<div class="move-row"><span class="move-num">${i+1}.</span><span style="${style}">${solutionMoves[i]}${checkmark}</span><span></span></div>`;
-  }
-  moveHistoryDiv.innerHTML = html;
-}
+// --- LISTENERS ---
 
-function setStatus(msg, type) {
-  statusTextEl.innerText = msg;
-  logInfo(`Status: [${type}] ${msg}`);
-}
+document.getElementById('ratingSlider').oninput = (e) => {
+    targetRating = parseInt(e.target.value);
+    document.getElementById('ratingValue').innerText = targetRating;
+};
 
-function resetPuzzle() {
-  if (!currentPuzzleData) return;
-  logInfo(`Resetting puzzle`);
-  game = new Chess(currentPuzzleData.fen);
-  expectedMoveIndex = 0;
-  waitingForMove = true;
-  if (board) board.position(game.fen());
-  updateProgress();
-  renderMoveHistory();
-  const turn = game.turn() === 'w' ? 'White' : 'Black';
-  setStatus(`${turn} to move. Reset.`, 'info');
-  statusDot.className = 'status-dot info';
-}
+document.getElementById('themeSelect').onchange = (e) => {
+    targetTheme = e.target.value;
+    loadPuzzle();
+};
 
-function solveFull() {
-  if (!currentPuzzleData) return;
-  logInfo(`Solving puzzle fully`);
-  waitingForMove = false;
-  for (let i = expectedMoveIndex; i < solutionMoves.length; i++) {
-    game.move(solutionMoves[i]);
-  }
-  if (board) board.position(game.fen());
-  expectedMoveIndex = solutionMoves.length;
-  updateProgress();
-  renderMoveHistory();
-  setStatus('Solution shown. Press Next for new puzzle.', 'info');
-  statusDot.className = 'status-dot info';
-}
+document.getElementById('nextBtn').onclick = loadPuzzle;
 
-function showHint() {
-  if (!waitingForMove) {
-    setStatus('Puzzle solved! Load next.', 'info');
-    return;
-  }
-  if (expectedMoveIndex < solutionMoves.length) {
-    const hintMove = solutionMoves[expectedMoveIndex];
-    logInfo(`Hint: ${hintMove}`);
-    setStatus(`💡 Hint: Try ${hintMove}`, 'info');
-    statusDot.className = 'status-dot info';
-  }
-}
+// Start the app
+initDatabase();
 
-async function nextPuzzle() {
-  if (isLoading) return;
-  logInfo(`Loading next puzzle from Lichess...`);
-  await loadPuzzle();
-}
-
-// ============================================================
-// FILTER HANDLERS
-// ============================================================
-function updateFilterUI() {
-  document.querySelectorAll('.pill[data-type="rating"]').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll(`.pill[data-type="rating"][data-val="${activeFilters.rating}"]`).forEach(p => p.classList.add('active'));
-  ratingSlider.value = activeFilters.rating;
-  ratingValue.innerText = activeFilters.rating;
-  
-  document.querySelectorAll('.pill[data-type="theme"]').forEach(p => p.classList.remove('active'));
-  if (activeFilters.theme) {
-    const themePill = document.querySelector(`.pill[data-type="theme"][data-val="${activeFilters.theme}"]`);
-    if (themePill) themePill.classList.add('active');
-  } else {
-    document.querySelector('.pill[data-type="theme"][data-val=""]').classList.add('active');
-  }
-}
-
-ratingSlider.addEventListener('input', (e) => {
-  activeFilters.rating = parseInt(e.target.value);
-  ratingValue.innerText = activeFilters.rating;
-  updateFilterUI();
-});
-document.querySelectorAll('.pill[data-type="rating"]').forEach(btn => btn.addEventListener('click', () => {
-  activeFilters.rating = parseInt(btn.dataset.val);
-  updateFilterUI();
-}));
-document.querySelectorAll('.pill[data-type="theme"]').forEach(btn => btn.addEventListener('click', () => {
-  activeFilters.theme = btn.dataset.val || '';
-  updateFilterUI();
-}));
-
-nextBtn.addEventListener('click', nextPuzzle);
-resetBtn.addEventListener('click', resetPuzzle);
-solveBtn.addEventListener('click', solveFull);
-hintBtn.addEventListener('click', showHint);
-
-document.getElementById('consoleToggle').addEventListener('click', () => {
-  console.log("%c🔍 Lichess Puzzle Trainer - Debug Console", "color: #81b64c; font-size: 14px; font-weight: bold;");
-  console.log("Current state:", { puzzle: currentPuzzleData?.id, boardReady: !!board, waitingForMove, isLoading });
-});
-
-// ============================================================
-// BOOTSTRAP
-// ============================================================
-logInfo("=== LICHESS PUZZLE TRAINER ===");
-logInfo("Fetching real puzzles from lichess.org API");
-loadPuzzle();
 </script>
 </body>
 </html>
