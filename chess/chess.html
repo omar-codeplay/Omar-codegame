@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  
+  <title>Chess Online | شطرنج أونلاين - Omar Gameplay</title>
+  <meta name="title" content="Chess Online | شطرنج أونلاين - Omar Gameplay - OmarCodePlay">
+  <meta name="description" content="العب الشطرنج مجاناً عبر الإنترنت بخصائص احترافية: توقيت مخصص، ثيمات متعددة، وحفظ سجل المباريات. تحدى أصدقاءك الآن على نفس الجهاز Omar Gameplay.">
+  <meta name="keywords" content="شطرنج, chess, play chess online, chess game, عمر جيم بلاي, omar gameplay, العاب ذكاء,OmarCodePlay, شطرنج أونلاين, لعب شطرنج, لعبة شطرنج مجانية, chess timer, custom time control, chess themes, save chess game,1vs1 same device chess, chess for two players, chess with friends, online chess game, free chess game, شطرنج للاعبين اثنين, شطرنج مع الأصدقاء, لعبة شطرنج مجانية عبر الإنترنت,chess offline,Omar Codeplay">
+  <meta name="author" content="OmarCodePlay">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://omar-gameplay.netlify.app/chess">
+  <meta property="og:title" content="Chess Online | شطرنج أونلاين - Omar Gameplay">
+  <meta property="og:description" content="العب الشطرنج مجاناً عبر الإنترنت بخصائص احترافية: توقيت مخصص، ثيمات متعددة، وحفظ سجل المباريات.">
+  <meta property="og:image" content="https://omar-gameplay.netlify.app/chess/image/chess.png"> <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://omar-gameplay.netlify.app/chess">
+  <meta property="twitter:title" content="Chess Online | شطرنج أونلاين - Omar Gameplay - OmarCodePlay">
+  <meta property="twitter:description" content="العب الشطرنج مجاناً عبر الإنترنت بخصائص احترافية وتصميم عصري.">
+  <meta property="twitter:image" content="https://omar-gameplay.netlify.app/chess/image/chess.png">
+
+  <link rel="icon" type="image/png" href="https://omar-gameplay.netlify.app/chess/image/ChessLogo.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <link rel="stylesheet" href="chess/Chess.css">
+  <link rel="icon" href="image/ChessLogo.png">
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+</head>
+<body>
+
+<!-- ══ TIME CONTROL PICKER ══ -->
+<div id="setup-overlay" class="overlay-screen">
+  <div class="setup-card">
+    <div class="setup-logo">♞ Chess</div>
+    <h2 class="setup-heading">Choose Time Control</h2>
+
+    <div class="tc-tabs">
+      <button class="tc-tab active" data-cat="bullet">🔥 Bullet</button>
+      <button class="tc-tab" data-cat="blitz">⚡ Blitz</button>
+      <button class="tc-tab" data-cat="rapid">🕐 Rapid</button>
+      <button class="tc-tab" data-cat="classical">♟ Classical</button>
+      <button class="tc-tab" data-cat="unlimited">∞ Unlimited</button>
+      <button class="tc-tab" data-cat="custom">⚙ Custom</button>
+    </div>
+
+    <div class="tc-options" id="tc-options"><!-- JS fills --></div>
+
+    <!-- ══ CUSTOM TIME SECTION ══ -->
+    <div class="custom-tc" id="custom-tc">
+
+      <!-- Toggle: asymmetric per-player time -->
+      <div class="asym-toggle-row">
+        <label>
+          <input type="checkbox" id="asymmetric-check">
+          ⚖ Different time per player
+        </label>
+      </div>
+
+      <!-- Symmetric fields (default) -->
+      <div id="sym-fields" class="custom-fields">
+        <div class="cf-group">
+          <label>Minutes / side</label>
+          <input type="number" id="custom-min" min="0" max="180" value="10">
+        </div>
+        <div class="cf-plus">+</div>
+        <div class="cf-group">
+          <label>Increment (sec)</label>
+          <input type="number" id="custom-inc" min="0" max="60" value="0">
+        </div>
+      </div>
+
+      <!-- Asymmetric per-player fields -->
+      <div id="asym-fields" style="display:none">
+        <div class="asym-players">
+          <!-- White -->
+          <div class="asym-player">
+            <div class="asym-player-header">
+              <div class="sn-icon white-av" style="width:24px;height:24px;font-size:13px">♕</div>
+              White time
+            </div>
+            <div class="cf-group">
+              <label>Seconds</label>
+              <input type="number" id="custom-white-sec" min="1" max="10800" value="90"
+                     placeholder="e.g. 90">
+            </div>
+          </div>
+
+          <!-- Black -->
+          <div class="asym-player">
+            <div class="asym-player-header">
+              <div class="sn-icon black-av" style="width:24px;height:24px;font-size:13px">♛</div>
+              Black time
+            </div>
+            <div class="cf-group">
+              <label>Seconds</label>
+              <input type="number" id="custom-black-sec" min="1" max="10800" value="180"
+                     placeholder="e.g. 180">
+            </div>
+          </div>
+        </div>
+
+        <!-- Shared increment -->
+        <div class="asym-inc-row">
+          <span class="asym-inc-label">Increment (sec, shared):</span>
+          <div class="cf-group" style="max-width:120px">
+            <input type="number" id="custom-asym-inc" min="0" max="60" value="0">
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- end custom-tc -->
+
+    <div class="setup-names">
+      <div class="sn-field">
+        <div class="sn-icon white-av">♕</div>
+        <input type="text" id="name-white" value="Player 1" maxlength="20" class="sn-input">
+      </div>
+      <div class="sn-vs">vs</div>
+      <div class="sn-field">
+        <div class="sn-icon black-av">♛</div>
+        <input type="text" id="name-black" value="Player 2" maxlength="20" class="sn-input">
+      </div>
+    </div>
+
+    <button id="start-btn" class="start-btn">▶ Play</button>
+  </div>
+</div>
+
+<!-- ══ PROMOTION PICKER ══ -->
+<div id="promo-overlay" class="overlay-screen" style="display:none">
+  <div class="promo-card">
+    <div class="promo-heading">Promote Pawn</div>
+    <div class="promo-grid" id="promo-grid"><!-- JS fills --></div>
+  </div>
+</div>
+
+<!-- ══ GAME RESULT ══ -->
+<div id="result-overlay" class="overlay-screen" style="display:none">
+  <div class="result-card">
+    <div class="result-emblem" id="result-emblem">♔</div>
+    <div class="result-title"  id="result-title">White Wins!</div>
+    <div class="result-reason" id="result-reason">by checkmate</div>
+    <div class="result-names">
+      <span id="rs-white">Player 1</span>
+      <span class="result-vs">vs</span>
+      <span id="rs-black">Player 2</span>
+    </div>
+    <div class="result-actions">
+      <button class="ra-btn"            id="ra-new">New Game</button>
+      <button class="ra-btn ra-rematch" id="ra-rematch">Rematch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN GAME ══ -->
+<div class="game-app" id="game-app" style="display:none">
+
+  <!-- Board column -->
+  <div class="board-col">
+
+    <!-- Black (top) -->
+    <div class="player-strip" id="strip-black">
+      <div class="ps-avatar black-av">♛</div>
+      <div class="ps-info">
+        <div class="ps-name"     id="pname-black">Player 2</div>
+        <div class="ps-captured" id="cap-black"></div>
+      </div>
+      <div class="ps-clock paused" id="clock-black">
+        <span id="time-black">—</span>
+      </div>
+    </div>
+
+    <!-- Board -->
+    <div class="board-row">
+      <div id="board" class="board-el theme-green"></div>
+    </div>
+
+    <!-- White (bottom) -->
+    <div class="player-strip active-strip" id="strip-white">
+      <div class="ps-avatar white-av">♕</div>
+      <div class="ps-info">
+        <div class="ps-name"     id="pname-white">Player 1</div>
+        <div class="ps-captured" id="cap-white"></div>
+      </div>
+      <div class="ps-clock active" id="clock-white">
+        <span id="time-white">—</span>
+      </div>
+    </div>
+
+  </div>
+  <!-- /board-col -->
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+
+    <!-- Top row: game badge + buttons -->
+    <div class="sb-topbar">
+      <div class="game-badge" id="game-badge">Rapid · 10+0</div>
+      <div class="sb-icons">
+        <!-- Manual flip -->
+        <button class="icon-btn" id="flip-btn"       title="Flip board (F)">⇅</button>
+        <!-- Auto-flip toggle -->
+        <button class="icon-btn" id="autoflip-btn"   title="Auto-flip after each move">🔃</button>
+        <!-- Fullscreen -->
+        <button class="icon-btn" id="fullscreen-btn" title="Fullscreen (F11)">⛶</button>
+        <!-- Theme -->
+        <button class="icon-btn" id="theme-btn"      title="Theme">🎨</button>
+      </div>
+    </div>
+
+    <!-- Theme picker row -->
+    <div class="theme-row" id="theme-row" style="display:none">
+      <button class="th-swatch active" data-theme="green"   title="Chess.com Green"  style="--a:#eeeed2;--b:#769656"></button>
+      <button class="th-swatch"        data-theme="classic" title="Classic Wood"      style="--a:#edd6af;--b:#b88761"></button>
+      <button class="th-swatch"        data-theme="ocean"   title="Ocean"              style="--a:#dee3e6;--b:#8ca2ad"></button>
+      <button class="th-swatch"        data-theme="walnut"  title="Walnut"             style="--a:#f0cfa0;--b:#7d4f2a"></button>
+      <button class="th-swatch"        data-theme="midnight"title="Midnight"           style="--a:#b4c7d9;--b:#3b5b87"></button>
+      <button class="th-swatch"        data-theme="ruby"    title="Ruby"               style="--a:#f3d5d5;--b:#b83232"></button>
+    </div>
+
+    <!-- Status -->
+    <div class="sb-status" id="sb-status">
+      <span class="ss-dot white-dot"></span>
+      <span id="status-txt">White to move</span>
+    </div>
+
+    <!-- Move list -->
+    <div class="move-scroll">
+      <div class="move-grid" id="move-grid"></div>
+    </div>
+
+    <!-- Nav + game controls -->
+    <div class="nav-row">
+      <button class="nav-btn" id="nav-start" title="Go to start">⏮</button>
+      <button class="nav-btn" id="nav-prev"  title="Previous">◀</button>
+      <button class="nav-btn" id="nav-next"  title="Next">▶</button>
+      <button class="nav-btn" id="nav-end"   title="Go to end">⏭</button>
+    </div>
+    <div class="game-ctrl-row">
+      <button class="gc-btn danger"  id="resign-btn">🏳 Resign</button>
+      <button class="gc-btn warn"    id="draw-btn">½ Draw</button>
+      <button class="gc-btn"         id="undo-btn">⟵ Undo</button>
+      <button class="gc-btn primary" id="new-game-btn">＋ New</button>
+    </div>
+
+    <!-- Extra -->
+    <div class="extra-row">
+      <button class="ex-btn" id="save-btn">💾 Save</button>
+      <button class="ex-btn" id="export-btn">📋 PGN</button>
+      <button class="ex-btn" id="fen-btn">🔗 FEN</button>
+      <button class="ex-btn" id="lib-btn">📚 Library</button>
+    </div>
+
+  </div>
+  <!-- /sidebar -->
+</div>
+<!-- /game-app -->
+
+<!-- ══ MODALS ══ -->
+<div id="fen-modal" class="modal"><div class="mc">
+  <span class="mc-close" data-modal="fen-modal">✕</span>
+  <h3>FEN Position</h3>
+  <textarea id="fen-input" class="mc-area" rows="3" placeholder="Paste FEN…"></textarea>
+  <div class="mc-row">
+    <button class="mc-btn"           id="confirm-fen">Load</button>
+    <button class="mc-btn secondary" id="copy-fen">Copy current FEN</button>
+  </div>
+</div></div>
+
+<div id="save-modal" class="modal"><div class="mc">
+  <span class="mc-close" data-modal="save-modal">✕</span>
+  <h3>Save Game</h3>
+  <input type="text" id="game-name" class="mc-inp" placeholder="Game name…">
+  <button class="mc-btn" id="confirm-save">Save</button>
+</div></div>
+
+<div id="library-modal" class="modal"><div class="mc wide">
+  <span class="mc-close" data-modal="library-modal">✕</span>
+  <h3>Game Library</h3>
+  <div id="lib-list" class="lib-list"></div>
+</div></div>
+
+<!-- Audio -->
+<audio id="snd-move"    src="chess/audio/move.mp3"    preload="auto"></audio>
+<audio id="snd-capture" src="chess/audio/capture.mp3" preload="auto"></audio>
+<audio id="snd-castle"  src="chess/audio/castle.mp3"  preload="auto"></audio>
+<audio id="snd-check"   src="chess/audio/check.mp3"   preload="auto"></audio>
+<audio id="snd-promote" src="chess/audio/promote.mp3" preload="auto"></audio>
+<audio id="snd-gameend" src="chess/audio/gameend.mp3" preload="auto"></audio>
+
+<script src="chess/Chess.js"></script>
+</body>
+</html>

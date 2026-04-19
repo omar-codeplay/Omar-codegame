@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board Editor · Chess Master</title>
+  <meta name="description" content="Set up any chess position. Place pieces freely, then play or analyze.">
+  <link rel="icon" href="images/ChessLogo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <style>
+    :root {
+      --bg: #161512; --panel: #1e1c19; --border: #3a3835;
+      --green: #81b64c; --blue: #4f85c9; --text: #e8e4dc; --text-secondary: #8a8278;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+    .header {
+      background:var(--panel); border-bottom:1px solid var(--border);
+      padding:0 24px; display:flex; align-items:center; height:60px;
+    }
+    .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .logo-icon { width:36px; height:36px; background:linear-gradient(135deg,var(--green),var(--blue)); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+    .logo-text { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; color:var(--text); }
+    .logo-text span { color:var(--green); }
+    .nav-links { margin-left:auto; display:flex; gap:8px; }
+    .nav-link { padding:8px 16px; color:var(--text-secondary); text-decoration:none; border-radius:6px; transition:0.2s; }
+    .nav-link:hover { background:var(--border); color:var(--text); }
+    .nav-link.active { color:var(--green); background:rgba(129,182,76,0.1); }
+    .editor-container {
+      max-width:1200px; margin:30px auto; padding:0 20px;
+      display:grid; grid-template-columns:1fr 300px; gap:30px;
+    }
+    .board-area { text-align:center; }
+    #editorBoard { width:100%; max-width:560px; margin:0 auto; }
+    .toolbar {
+      background:var(--panel); border:1px solid var(--border);
+      border-radius:16px; padding:20px;
+    }
+    .palette-title { font-size:14px; color:var(--text-secondary); margin-bottom:12px; }
+    .piece-palette {
+      display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-bottom:20px;
+    }
+    .palette-piece {
+      aspect-ratio:1; background:var(--bg); border:2px solid var(--border);
+      border-radius:8px; display:flex; align-items:center; justify-content:center;
+      cursor:grab; transition:0.2s;
+    }
+    .palette-piece.selected { border-color:var(--green); box-shadow:0 0 15px var(--green); }
+    .palette-piece img { width:80%; height:80%; object-fit:contain; }
+    .color-section { margin:15px 0; }
+    .btn {
+      width:100%; padding:12px; margin-bottom:10px; border:none;
+      border-radius:8px; font-weight:600; cursor:pointer; transition:0.2s;
+      background:var(--panel); border:1px solid var(--border); color:var(--text);
+    }
+    .btn-primary { background:var(--green); color:#111; border:none; }
+    .btn:hover { filter:brightness(1.2); }
+    .fen-display {
+      margin-top:20px; padding:10px; background:var(--bg); border-radius:8px;
+      font-family:monospace; font-size:12px; word-break:break-all;
+    }
+    .selected-info { margin:10px 0; font-size:14px; }
+  </style>
+</head>
+<body>
+<header class="header">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">♞</div>
+    <div class="logo-text">Chess<span>Master</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="puzzles.html" class="nav-link">Puzzles</a>
+    <a href="practice.html" class="nav-link">Practice</a>
+    <a href="editor.html" class="nav-link active">Editor</a>
+  </div>
+</header>
+
+<div class="editor-container">
+  <div class="board-area">
+    <div id="editorBoard"></div>
+    <div class="fen-display" id="fenDisplay"></div>
+  </div>
+  <div class="toolbar">
+    <div class="palette-title">♔ White Pieces</div>
+    <div class="piece-palette" id="whitePalette"></div>
+    <div class="palette-title">♚ Black Pieces</div>
+    <div class="piece-palette" id="blackPalette"></div>
+    
+    <div class="selected-info" id="selectedInfo">Selected: none</div>
+    
+    <button class="btn" id="clearBoardBtn">🗑 Clear Board</button>
+    <button class="btn" id="startPosBtn">♜ Start Position</button>
+    <button class="btn" id="flipBoardBtn">⇅ Flip Board</button>
+    <button class="btn btn-primary" id="playBtn">▶ Play This Position</button>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script>
+  const PIECE_PATH = 'images/';
+  const pieceNames = { k:'King', q:'Queen', r:'Rook', b:'Bishop', n:'Knight', p:'Pawn' };
+  
+  let board, chess = new Chess();
+  let selectedPiece = null; // { color, type }
+  let orientation = 'white';
+
+  // Build piece palette
+  function buildPalette() {
+    const whitePieces = ['k','q','r','b','n','p'];
+    const blackPieces = ['k','q','r','b','n','p'];
+    const whiteDiv = document.getElementById('whitePalette');
+    const blackDiv = document.getElementById('blackPalette');
+    
+    whitePieces.forEach(type => {
+      const div = createPalettePiece('w', type);
+      whiteDiv.appendChild(div);
+    });
+    blackPieces.forEach(type => {
+      const div = createPalettePiece('b', type);
+      blackDiv.appendChild(div);
+    });
+  }
+  
+  function createPalettePiece(color, type) {
+    const div = document.createElement('div');
+    div.className = 'palette-piece';
+    div.setAttribute('data-color', color);
+    div.setAttribute('data-type', type);
+    const img = document.createElement('img');
+    img.src = `${PIECE_PATH}${color==='w'?'white':'black'}-${pieceNames[type]}.png`;
+    img.alt = type;
+    img.draggable = false;
+    div.appendChild(img);
+    
+    div.addEventListener('click', (e) => {
+      document.querySelectorAll('.palette-piece').forEach(p => p.classList.remove('selected'));
+      div.classList.add('selected');
+      selectedPiece = { color, type };
+      document.getElementById('selectedInfo').textContent = `Selected: ${color==='w'?'White':'Black'} ${pieceNames[type]}`;
+    });
+    
+    return div;
+  }
+
+  // Initialize board
+  board = ChessBoard('editorBoard', {
+    position: 'start',
+    pieceTheme: function(piece) {
+      const color = piece.charAt(0) === 'w' ? 'white' : 'black';
+      const type = piece.charAt(1).toLowerCase();
+      return PIECE_PATH + color + '-' + pieceNames[type] + '.png';
+    },
+    draggable: true,
+    onDragStart: (source, piece) => {
+      // In editor mode, we allow any drag, but we'll also handle drops manually
+      return true;
+    },
+    onDrop: (source, target) => {
+      // Manual piece movement: remove from source, add to target
+      const piece = chess.get(source);
+      if (piece) {
+        chess.remove(source);
+        chess.put({ type: piece.type, color: piece.color }, target);
+      }
+      board.position(chess.fen());
+      updateFenDisplay();
+    },
+    onSnapEnd: () => board.position(chess.fen())
+  });
+
+  // Click on board square to place selected piece
+  $('#editorBoard').on('click', '.square-55d63', function() {
+    if (!selectedPiece) return;
+    const square = $(this).attr('data-square');
+    // Remove any existing piece
+    chess.remove(square);
+    // Place selected piece
+    chess.put({ type: selectedPiece.type, color: selectedPiece.color }, square);
+    board.position(chess.fen());
+    updateFenDisplay();
+  });
+
+  function updateFenDisplay() {
+    document.getElementById('fenDisplay').textContent = 'FEN: ' + chess.fen();
+  }
+
+  function clearBoard() {
+    chess.clear();
+    board.position('8/8/8/8/8/8/8/8');
+    updateFenDisplay();
+  }
+
+  function setStartPosition() {
+    chess.reset();
+    board.position('start');
+    updateFenDisplay();
+  }
+
+  function flipBoard() {
+    orientation = orientation === 'white' ? 'black' : 'white';
+    board.orientation(orientation);
+  }
+
+  function playFromEditor() {
+    const fen = chess.fen();
+    localStorage.setItem('chess_custom_fen', fen);
+    window.location.href = 'Chess.html?fen=' + encodeURIComponent(fen);
+  }
+
+  // Event listeners
+  document.getElementById('clearBoardBtn').addEventListener('click', clearBoard);
+  document.getElementById('startPosBtn').addEventListener('click', setStartPosition);
+  document.getElementById('flipBoardBtn').addEventListener('click', flipBoard);
+  document.getElementById('playBtn').addEventListener('click', playFromEditor);
+
+  // Init
+  buildPalette();
+  updateFenDisplay();
+</script>
+</body>
+</html>

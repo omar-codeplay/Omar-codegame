@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Practice · Chess Master</title>
+  <meta name="description" content="Practice chess moves freely. Play both sides and experiment with openings.">
+  <link rel="icon" href="images/ChessLogo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  <style>
+    :root {
+      --bg: #161512; --panel: #1e1c19; --border: #3a3835;
+      --green: #81b64c; --text: #e8e4dc; --text-secondary: #8a8278;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+    .header {
+      background:var(--panel); border-bottom:1px solid var(--border);
+      padding:0 24px; display:flex; align-items:center; height:60px;
+    }
+    .logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+    .logo-icon { width:36px; height:36px; background:linear-gradient(135deg,var(--green),#4f85c9); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:22px; }
+    .logo-text { font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:700; color:var(--text); }
+    .logo-text span { color:var(--green); }
+    .nav-links { margin-left:auto; display:flex; gap:8px; }
+    .nav-link { padding:8px 16px; color:var(--text-secondary); text-decoration:none; border-radius:6px; transition:0.2s; }
+    .nav-link:hover { background:var(--border); color:var(--text); }
+    .nav-link.active { color:var(--green); background:rgba(129,182,76,0.1); }
+    .container {
+      max-width:1000px; margin:30px auto; padding:0 20px;
+      display:flex; flex-direction:column; align-items:center;
+    }
+    #practiceBoard { width:100%; max-width:600px; margin-bottom:20px; }
+    .controls {
+      display:flex; gap:15px; flex-wrap:wrap; justify-content:center;
+      background:var(--panel); padding:20px; border-radius:16px; border:1px solid var(--border);
+    }
+    .btn {
+      padding:12px 24px; border:none; border-radius:8px; font-weight:600; cursor:pointer;
+      background:var(--panel); border:1px solid var(--border); color:var(--text);
+    }
+    .btn-primary { background:var(--green); color:#111; border:none; }
+    .btn:hover { filter:brightness(1.2); }
+    .status { margin:15px 0; font-size:18px; }
+    .move-history {
+      max-height:200px; overflow-y:auto; width:100%; max-width:300px;
+      background:var(--panel); border-radius:8px; padding:15px; margin-top:20px;
+    }
+    .move-row { display:flex; padding:4px 0; font-family:monospace; }
+    .move-num { width:35px; color:var(--text-secondary); }
+  </style>
+</head>
+<body>
+<header class="header">
+  <a href="index.html" class="logo">
+    <div class="logo-icon">♞</div>
+    <div class="logo-text">Chess<span>Master</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="puzzles.html" class="nav-link">Puzzles</a>
+    <a href="practice.html" class="nav-link active">Practice</a>
+    <a href="editor.html" class="nav-link">Editor</a>
+  </div>
+</header>
+
+<div class="container">
+  <div id="practiceBoard"></div>
+  <div class="status" id="gameStatus">White to move</div>
+  <div class="controls">
+    <button class="btn" id="flipBtn">⇅ Flip Board</button>
+    <button class="btn" id="undoBtn">↩ Undo</button>
+    <button class="btn btn-primary" id="resetBtn">⟲ New Game</button>
+  </div>
+  <div class="move-history" id="moveHistory"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+<script>
+  const PIECE_PATH = 'images/';
+  function pieceTheme(piece) {
+    const color = piece.charAt(0) === 'w' ? 'white' : 'black';
+    const names = { p:'pawn', n:'knight', b:'bishop', r:'rook', q:'queen', k:'king' };
+    return PIECE_PATH + color + '-' + names[piece.charAt(1).toLowerCase()] + '.png';
+  }
+
+  let board, chess = new Chess();
+  
+  board = ChessBoard('practiceBoard', {
+    position: 'start',
+    pieceTheme: pieceTheme,
+    draggable: true,
+    onDragStart: (source, piece) => {
+      if (chess.game_over()) return false;
+      // Allow moving any piece (practice mode)
+      return true;
+    },
+    onDrop: (source, target) => {
+      const move = chess.move({ from: source, to: target, promotion: 'q' });
+      if (move === null) return 'snapback';
+      board.position(chess.fen());
+      updateStatus();
+      updateHistory();
+    }
+  });
+
+  function updateStatus() {
+    const turn = chess.turn() === 'w' ? 'White' : 'Black';
+    let status = `${turn} to move`;
+    if (chess.in_check()) status += ' (Check!)';
+    if (chess.game_over()) {
+      if (chess.in_checkmate()) status = `Checkmate! ${turn === 'White' ? 'Black' : 'White'} wins.`;
+      else if (chess.in_stalemate()) status = 'Stalemate! Draw.';
+      else if (chess.in_threefold_repetition()) status = 'Draw by repetition.';
+      else if (chess.insufficient_material()) status = 'Draw (insufficient material).';
+      else status = 'Game over.';
+    }
+    document.getElementById('gameStatus').textContent = status;
+  }
+
+  function updateHistory() {
+    const history = chess.history();
+    let html = '';
+    for (let i=0; i<history.length; i+=2) {
+      html += `<div class="move-row"><span class="move-num">${Math.floor(i/2)+1}.</span>`;
+      html += `<span>${history[i]}</span><span style="margin-left:15px;">${history[i+1]||''}</span></div>`;
+    }
+    document.getElementById('moveHistory').innerHTML = html;
+  }
+
+  document.getElementById('flipBtn').addEventListener('click', () => board.flip());
+  document.getElementById('undoBtn').addEventListener('click', () => {
+    chess.undo();
+    board.position(chess.fen());
+    updateStatus();
+    updateHistory();
+  });
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    chess.reset();
+    board.position('start');
+    updateStatus();
+    updateHistory();
+  });
+
+  updateStatus();
+</script>
+</body>
+</html>

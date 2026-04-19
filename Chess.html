@@ -4,298 +4,493 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   
-  <title>Chess Online | شطرنج أونلاين - Omar Gameplay</title>
-  <meta name="title" content="Chess Online | شطرنج أونلاين - Omar Gameplay - OmarCodePlay">
-  <meta name="description" content="العب الشطرنج مجاناً عبر الإنترنت بخصائص احترافية: توقيت مخصص، ثيمات متعددة، وحفظ سجل المباريات. تحدى أصدقاءك الآن على نفس الجهاز Omar Gameplay.">
-  <meta name="keywords" content="شطرنج, chess, play chess online, chess game, عمر جيم بلاي, omar gameplay, العاب ذكاء,OmarCodePlay, شطرنج أونلاين, لعب شطرنج, لعبة شطرنج مجانية, chess timer, custom time control, chess themes, save chess game,1vs1 same device chess, chess for two players, chess with friends, online chess game, free chess game, شطرنج للاعبين اثنين, شطرنج مع الأصدقاء, لعبة شطرنج مجانية عبر الإنترنت,chess offline,Omar Codeplay">
+  <title>Chess Master • Play, Learn & Master Chess Online | Omar Gameplay</title>
+  <meta name="description" content="Play chess online for free. Challenge friends, solve puzzles, practice tactics, set up custom positions with our board editor, and save your games.">
+  <meta name="keywords" content="chess, play chess online, chess puzzles, chess tactics, 1v1 chess, chess practice, chess board editor, chess library">
   <meta name="author" content="OmarCodePlay">
-  <meta name="robots" content="index, follow">
-
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://omar-gameplay.netlify.app/chess">
-  <meta property="og:title" content="Chess Online | شطرنج أونلاين - Omar Gameplay">
-  <meta property="og:description" content="العب الشطرنج مجاناً عبر الإنترنت بخصائص احترافية: توقيت مخصص، ثيمات متعددة، وحفظ سجل المباريات.">
-  <meta property="og:image" content="https://omar-gameplay.netlify.app/chess/image/chess.png"> <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://omar-gameplay.netlify.app/chess">
-  <meta property="twitter:title" content="Chess Online | شطرنج أونلاين - Omar Gameplay - OmarCodePlay">
-  <meta property="twitter:description" content="العب الشطرنج مجاناً عبر الإنترنت بخصائص احترافية وتصميم عصري.">
-  <meta property="twitter:image" content="https://omar-gameplay.netlify.app/chess/image/chess.png">
-
-  <link rel="icon" type="image/png" href="https://omar-gameplay.netlify.app/chess/image/ChessLogo.png">
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
-  <link rel="stylesheet" href="chess/Chess.css">
-  <link rel="icon" href="image/ChessLogo.png">
   
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+  <meta property="og:title" content="Chess Master • Play, Learn & Master Chess Online">
+  <meta property="og:description" content="Play chess online for free. 1v1 matches, puzzles, tactics training, board editor, and game library.">
+  <meta property="og:image" content="https://omar-gameplay.netlify.app/chess/image/chess-og.png">
+  <meta property="og:type" content="website">
+  
+  <link rel="icon" type="image/png" href="chess/image/ChessLogo.png">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.css">
+  
+  <style>
+    /* ── CHESS MASTER HOMEPAGE (UPDATED) ── */
+    :root {
+      --bg-primary: #161512;
+      --bg-secondary: #1e1c19;
+      --bg-tertiary: #272420;
+      --border-color: #3a3835;
+      --accent-green: #81b64c;
+      --accent-blue: #4f85c9;
+      --accent-purple: #9b59b6;
+      --accent-orange: #e67e22;
+      --accent-gold: #f4c143;
+      --accent-red: #e74c3c;
+      --text-primary: #e8e4dc;
+      --text-secondary: #8a8278;
+      --text-muted: #5a5550;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    
+    .nav {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 70px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+    
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    
+    .logo-text span { color: var(--accent-green); }
+    
+    .nav-links { display: flex; gap: 8px; }
+    .nav-link {
+      padding: 8px 16px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .nav-link:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+    .nav-link.active { color: var(--accent-green); background: rgba(129,182,76,0.1); }
+    
+    /* Hero */
+    .hero {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    
+    .hero-content h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+    .hero-content h1 span {
+      background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-content p { font-size: 18px; color: var(--text-secondary); margin-bottom: 32px; }
+    .hero-stats { display: flex; gap: 32px; }
+    .stat-number { font-size: 32px; font-weight: 700; }
+    .stat-label { font-size: 14px; color: var(--text-secondary); }
+    
+    .hero-board {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      border: 1px solid var(--border-color);
+    }
+    
+    /* Feature Cards */
+    .features {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: block;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover { transform: translateY(-4px); border-color: var(--accent-green); box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+    .feature-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, rgba(129,182,76,0.2), rgba(129,182,76,0.1));
+      color: var(--accent-green);
+    }
+    .feature-card:nth-child(2) .feature-icon { background: linear-gradient(135deg, rgba(155,89,182,0.2), rgba(155,89,182,0.1)); color: var(--accent-purple); }
+    .feature-card:nth-child(3) .feature-icon { background: linear-gradient(135deg, rgba(79,133,201,0.2), rgba(79,133,201,0.1)); color: var(--accent-blue); }
+    .feature-card:nth-child(4) .feature-icon { background: linear-gradient(135deg, rgba(244,193,67,0.2), rgba(244,193,67,0.1)); color: var(--accent-gold); }
+    .feature-card h3 { font-size: 24px; margin-bottom: 12px; color: var(--text-primary); }
+    .feature-card p { color: var(--text-secondary); }
+    .feature-badge {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      padding: 4px 12px;
+      background: var(--bg-tertiary);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+    }
+    
+    /* Puzzles Section */
+    .puzzles-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+    .puzzle-categories {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .puzzle-cat {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .puzzle-cat:hover { border-color: var(--accent-blue); background: var(--bg-tertiary); }
+    .puzzle-cat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+    .puzzle-cat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: linear-gradient(135deg, rgba(231,76,60,0.2), rgba(231,76,60,0.1));
+      color: var(--accent-red);
+    }
+    .puzzle-cat:nth-child(2) .puzzle-cat-icon { background: linear-gradient(135deg, rgba(79,133,201,0.2), rgba(79,133,201,0.1)); color: var(--accent-blue); }
+    .puzzle-cat:nth-child(3) .puzzle-cat-icon { background: linear-gradient(135deg, rgba(46,204,113,0.2), rgba(46,204,113,0.1)); color: #2ecc71; }
+    .puzzle-cat h4 { font-size: 20px; margin-bottom: 8px; }
+    .puzzle-cat p { color: var(--text-secondary); font-size: 14px; }
+    
+    /* Recent Games */
+    .recent-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+    .recent-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .view-all { color: var(--accent-green); text-decoration: none; font-weight: 600; }
+    .recent-list {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .recent-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+    }
+    .recent-item:hover { background: var(--bg-tertiary); }
+    .recent-players { display: flex; align-items: center; gap: 12px; }
+    .player-badge { display: flex; align-items: center; gap: 8px; }
+    .color-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .player-badge.white .color-dot { background: #e8e4dc; }
+    .player-badge.black .color-dot { background: #2a2825; border: 1.5px solid #888; }
+    .vs-text { color: var(--text-muted); font-size: 12px; font-weight: 600; }
+    .result-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .result-badge.win { background: rgba(129,182,76,0.2); color: var(--accent-green); }
+    .result-badge.draw { background: rgba(244,193,67,0.2); color: var(--accent-gold); }
+    .result-badge.loss { background: rgba(231,76,60,0.2); color: var(--accent-red); }
+    .recent-date { color: var(--text-muted); font-size: 13px; }
+    
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      padding: 40px 24px;
+      margin-top: 40px;
+    }
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-copyright { color: var(--text-muted); }
+    .footer-links { display: flex; gap: 32px; }
+    .footer-links a { color: var(--text-secondary); text-decoration: none; }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero { grid-template-columns: 1fr; text-align: center; }
+      .hero-stats { justify-content: center; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .puzzle-categories { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .logo-text { display: none; }
+      .recent-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ══ TIME CONTROL PICKER ══ -->
-<div id="setup-overlay" class="overlay-screen">
-  <div class="setup-card">
-    <div class="setup-logo">♞ Chess</div>
-    <h2 class="setup-heading">Choose Time Control</h2>
-
-    <div class="tc-tabs">
-      <button class="tc-tab active" data-cat="bullet">🔥 Bullet</button>
-      <button class="tc-tab" data-cat="blitz">⚡ Blitz</button>
-      <button class="tc-tab" data-cat="rapid">🕐 Rapid</button>
-      <button class="tc-tab" data-cat="classical">♟ Classical</button>
-      <button class="tc-tab" data-cat="unlimited">∞ Unlimited</button>
-      <button class="tc-tab" data-cat="custom">⚙ Custom</button>
+<!-- ── HEADER ── -->
+<header class="header">
+  <nav class="nav">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">♞</div>
+      <div class="logo-text">Chess<span>Master</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link active">Home</a>
+      <a href="puzzles.html" class="nav-link">Puzzles</a>
+      <a href="practice.html" class="nav-link">Practice</a>
+      <a href="editor.html" class="nav-link">Editor</a>
     </div>
+  </nav>
+</header>
 
-    <div class="tc-options" id="tc-options"><!-- JS fills --></div>
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Master Chess<br><span>Your Way</span></h1>
+    <p>Play, learn, and improve with our professional chess platform. Challenge friends, solve puzzles, and set up any position.</p>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-number">10K+</span><span class="stat-label">Puzzles</span></div>
+      <div class="stat-item"><span class="stat-number">∞</span><span class="stat-label">Free Games</span></div>
+      <div class="stat-item"><span class="stat-number">6</span><span class="stat-label">Themes</span></div>
+    </div>
+  </div>
+  <div class="hero-board">
+    <div id="heroBoard" style="width:100%; aspect-ratio:1;"></div>
+  </div>
+</section>
 
-    <!-- ══ CUSTOM TIME SECTION ══ -->
-    <div class="custom-tc" id="custom-tc">
+<!-- ── MAIN FEATURES ── -->
+<section class="features">
+  <h2 class="section-title"><span>⚡</span> Play Chess</h2>
+  <div class="feature-grid">
+    <!-- 1v1 Card -->
+    <a href="chess/Chess.html" class="feature-card">
+      <span class="feature-badge">2 Players</span>
+      <div class="feature-icon">⚔️</div>
+      <h3>1v1 Match</h3>
+      <p>Challenge a friend on the same device. Custom time controls, multiple themes, and full game analysis.</p>
+    </a>
+    <!-- Practice Card -->
+    <a href="chess/practice.html" class="feature-card">
+      <span class="feature-badge">Training</span>
+      <div class="feature-icon">🎯</div>
+      <h3>Practice Mode</h3>
+      <p>Play against yourself or explore openings. Perfect for learning new strategies.</p>
+    </a>
+    <!-- Puzzles Card -->
+    <a href="chess/puzzles.html" class="feature-card">
+      <span class="feature-badge">10,000+ Puzzles</span>
+      <div class="feature-icon">🧩</div>
+      <h3>Chess Puzzles</h3>
+      <p>Solve tactical puzzles to sharpen your skills. Mate patterns, tactics, and endgame studies.</p>
+    </a>
+    <!-- Editor Card -->
+    <a href="editor.html" class="feature-card">
+      <span class="feature-badge">Custom Setup</span>
+      <div class="feature-icon">✏️</div>
+      <h3>Board Editor</h3>
+      <p>Place any piece anywhere. Create custom positions, then play or analyze.</p>
+    </a>
+  </div>
+</section>
 
-      <!-- Toggle: asymmetric per-player time -->
-      <div class="asym-toggle-row">
-        <label>
-          <input type="checkbox" id="asymmetric-check">
-          ⚖ Different time per player
-        </label>
-      </div>
+<!-- ── PUZZLES PREVIEW ── -->
+<section class="puzzles-section">
+  <h2 class="section-title"><span>🧩</span> Puzzle Training</h2>
+  <div class="puzzle-categories">
+    <div class="puzzle-cat" onclick="window.location.href='puzzles.html'">
+      <div class="puzzle-cat-header"><div class="puzzle-cat-icon">👑</div><h4>Checkmate</h4></div>
+      <p>Master essential checkmate patterns. From basic to advanced.</p>
+    </div>
+    <div class="puzzle-cat" onclick="window.location.href='puzzles.html'">
+      <div class="puzzle-cat-header"><div class="puzzle-cat-icon">⚡</div><h4>Middlegame</h4></div>
+      <p>Forks, pins, skewers, and tactical motifs.</p>
+    </div>
+    <div class="puzzle-cat" onclick="window.location.href='puzzles.html'">
+      <div class="puzzle-cat-header"><div class="puzzle-cat-icon">🎯</div><h4>Endgame</h4></div>
+      <p>Convert advantages and master theoretical positions.</p>
+    </div>
+  </div>
+</section>
 
-      <!-- Symmetric fields (default) -->
-      <div id="sym-fields" class="custom-fields">
-        <div class="cf-group">
-          <label>Minutes / side</label>
-          <input type="number" id="custom-min" min="0" max="180" value="10">
-        </div>
-        <div class="cf-plus">+</div>
-        <div class="cf-group">
-          <label>Increment (sec)</label>
-          <input type="number" id="custom-inc" min="0" max="60" value="0">
-        </div>
-      </div>
+<!-- ── RECENT GAMES (from library) ── -->
+<section class="recent-section">
+  <div class="recent-header">
+    <h2 class="section-title" style="margin-bottom:0;"><span>📋</span> Recent Games</h2>
+    <a href="#" class="view-all" onclick="openLibrary(); return false;">View Library →</a>
+  </div>
+  <div class="recent-list" id="recentGamesList"></div>
+</section>
 
-      <!-- Asymmetric per-player fields -->
-      <div id="asym-fields" style="display:none">
-        <div class="asym-players">
-          <!-- White -->
-          <div class="asym-player">
-            <div class="asym-player-header">
-              <div class="sn-icon white-av" style="width:24px;height:24px;font-size:13px">♕</div>
-              White time
-            </div>
-            <div class="cf-group">
-              <label>Seconds</label>
-              <input type="number" id="custom-white-sec" min="1" max="10800" value="90"
-                     placeholder="e.g. 90">
-            </div>
+<!-- ── FOOTER ── -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-copyright">© 2024 Chess Master by Omar Gameplay</div>
+    <div class="footer-links">
+      <a href="#">About</a>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard-js/1.0.0/chessboard-1.0.0.min.js"></script>
+
+<script>
+  // Piece theme for hero board
+  const PIECE_PATH = 'chess/images/';
+  function pieceTheme(piece) {
+    const color = piece.charAt(0) === 'w' ? 'white' : 'black';
+    const names = { p:'pawn', n:'knight', b:'bishop', r:'rook', q:'queen', k:'king' };
+    return PIECE_PATH + color + '-' + names[piece.charAt(1).toLowerCase()] + '.png';
+  }
+
+  // Hero board preview
+  ChessBoard('heroBoard', {
+    position: 'start',
+    orientation: 'white',
+    showNotation: false,
+    draggable: false,
+    pieceTheme: pieceTheme
+  });
+
+  // Simple GameLibrary (same as original, used for recent games)
+  class GameLibrary {
+    constructor() {
+      this.games = JSON.parse(localStorage.getItem('chess_games_v2') || '[]');
+    }
+    all() { return [...this.games].reverse(); }
+    recent(limit=3) { return this.all().slice(0,limit); }
+  }
+  const lib = new GameLibrary();
+
+  function renderRecentGames() {
+    const container = document.getElementById('recentGamesList');
+    const games = lib.recent(5);
+    if (games.length === 0) {
+      container.innerHTML = '<div class="recent-item"><span style="color: var(--text-secondary);">No recent games. Play a match to see it here!</span></div>';
+      return;
+    }
+    container.innerHTML = games.map(game => {
+      const result = game.pgn.includes('1-0') ? 'win' : game.pgn.includes('0-1') ? 'loss' : 'draw';
+      const whiteMatch = game.pgn.match(/\[White "([^"]+)"\]/);
+      const blackMatch = game.pgn.match(/\[Black "([^"]+)"\]/);
+      const white = whiteMatch ? whiteMatch[1] : 'Player 1';
+      const black = blackMatch ? blackMatch[1] : 'Player 2';
+      return `
+        <div class="recent-item" onclick="window.location.href='Chess.html?load=${game.id}'">
+          <div class="recent-players">
+            <div class="player-badge white"><span class="color-dot"></span><span>${white}</span></div>
+            <span class="vs-text">vs</span>
+            <div class="player-badge black"><span class="color-dot"></span><span>${black}</span></div>
           </div>
-
-          <!-- Black -->
-          <div class="asym-player">
-            <div class="asym-player-header">
-              <div class="sn-icon black-av" style="width:24px;height:24px;font-size:13px">♛</div>
-              Black time
-            </div>
-            <div class="cf-group">
-              <label>Seconds</label>
-              <input type="number" id="custom-black-sec" min="1" max="10800" value="180"
-                     placeholder="e.g. 180">
-            </div>
+          <div class="recent-result">
+            <span class="result-badge ${result}">${result==='win'?'1-0':result==='loss'?'0-1':'½-½'}</span>
+            <span class="recent-date">${game.date.split(',')[0]}</span>
           </div>
         </div>
+      `;
+    }).join('');
+  }
 
-        <!-- Shared increment -->
-        <div class="asym-inc-row">
-          <span class="asym-inc-label">Increment (sec, shared):</span>
-          <div class="cf-group" style="max-width:120px">
-            <input type="number" id="custom-asym-inc" min="0" max="60" value="0">
-          </div>
-        </div>
-      </div>
+  function openLibrary() {
+    // Redirect to a library page or open a modal – for simplicity, we'll alert.
+    // In a full implementation, you could have a library.html page.
+    alert('Game library feature available in the original Chess.html sidebar (📚 Library button).');
+  }
 
-    </div>
-    <!-- end custom-tc -->
+  document.addEventListener('DOMContentLoaded', renderRecentGames);
+</script>
 
-    <div class="setup-names">
-      <div class="sn-field">
-        <div class="sn-icon white-av">♕</div>
-        <input type="text" id="name-white" value="Player 1" maxlength="20" class="sn-input">
-      </div>
-      <div class="sn-vs">vs</div>
-      <div class="sn-field">
-        <div class="sn-icon black-av">♛</div>
-        <input type="text" id="name-black" value="Player 2" maxlength="20" class="sn-input">
-      </div>
-    </div>
-
-    <button id="start-btn" class="start-btn">▶ Play</button>
-  </div>
-</div>
-
-<!-- ══ PROMOTION PICKER ══ -->
-<div id="promo-overlay" class="overlay-screen" style="display:none">
-  <div class="promo-card">
-    <div class="promo-heading">Promote Pawn</div>
-    <div class="promo-grid" id="promo-grid"><!-- JS fills --></div>
-  </div>
-</div>
-
-<!-- ══ GAME RESULT ══ -->
-<div id="result-overlay" class="overlay-screen" style="display:none">
-  <div class="result-card">
-    <div class="result-emblem" id="result-emblem">♔</div>
-    <div class="result-title"  id="result-title">White Wins!</div>
-    <div class="result-reason" id="result-reason">by checkmate</div>
-    <div class="result-names">
-      <span id="rs-white">Player 1</span>
-      <span class="result-vs">vs</span>
-      <span id="rs-black">Player 2</span>
-    </div>
-    <div class="result-actions">
-      <button class="ra-btn"            id="ra-new">New Game</button>
-      <button class="ra-btn ra-rematch" id="ra-rematch">Rematch</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MAIN GAME ══ -->
-<div class="game-app" id="game-app" style="display:none">
-
-  <!-- Board column -->
-  <div class="board-col">
-
-    <!-- Black (top) -->
-    <div class="player-strip" id="strip-black">
-      <div class="ps-avatar black-av">♛</div>
-      <div class="ps-info">
-        <div class="ps-name"     id="pname-black">Player 2</div>
-        <div class="ps-captured" id="cap-black"></div>
-      </div>
-      <div class="ps-clock paused" id="clock-black">
-        <span id="time-black">—</span>
-      </div>
-    </div>
-
-    <!-- Board -->
-    <div class="board-row">
-      <div id="board" class="board-el theme-green"></div>
-    </div>
-
-    <!-- White (bottom) -->
-    <div class="player-strip active-strip" id="strip-white">
-      <div class="ps-avatar white-av">♕</div>
-      <div class="ps-info">
-        <div class="ps-name"     id="pname-white">Player 1</div>
-        <div class="ps-captured" id="cap-white"></div>
-      </div>
-      <div class="ps-clock active" id="clock-white">
-        <span id="time-white">—</span>
-      </div>
-    </div>
-
-  </div>
-  <!-- /board-col -->
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-
-    <!-- Top row: game badge + buttons -->
-    <div class="sb-topbar">
-      <div class="game-badge" id="game-badge">Rapid · 10+0</div>
-      <div class="sb-icons">
-        <!-- Manual flip -->
-        <button class="icon-btn" id="flip-btn"       title="Flip board (F)">⇅</button>
-        <!-- Auto-flip toggle -->
-        <button class="icon-btn" id="autoflip-btn"   title="Auto-flip after each move">🔃</button>
-        <!-- Fullscreen -->
-        <button class="icon-btn" id="fullscreen-btn" title="Fullscreen (F11)">⛶</button>
-        <!-- Theme -->
-        <button class="icon-btn" id="theme-btn"      title="Theme">🎨</button>
-      </div>
-    </div>
-
-    <!-- Theme picker row -->
-    <div class="theme-row" id="theme-row" style="display:none">
-      <button class="th-swatch active" data-theme="green"   title="Chess.com Green"  style="--a:#eeeed2;--b:#769656"></button>
-      <button class="th-swatch"        data-theme="classic" title="Classic Wood"      style="--a:#edd6af;--b:#b88761"></button>
-      <button class="th-swatch"        data-theme="ocean"   title="Ocean"              style="--a:#dee3e6;--b:#8ca2ad"></button>
-      <button class="th-swatch"        data-theme="walnut"  title="Walnut"             style="--a:#f0cfa0;--b:#7d4f2a"></button>
-      <button class="th-swatch"        data-theme="midnight"title="Midnight"           style="--a:#b4c7d9;--b:#3b5b87"></button>
-      <button class="th-swatch"        data-theme="ruby"    title="Ruby"               style="--a:#f3d5d5;--b:#b83232"></button>
-    </div>
-
-    <!-- Status -->
-    <div class="sb-status" id="sb-status">
-      <span class="ss-dot white-dot"></span>
-      <span id="status-txt">White to move</span>
-    </div>
-
-    <!-- Move list -->
-    <div class="move-scroll">
-      <div class="move-grid" id="move-grid"></div>
-    </div>
-
-    <!-- Nav + game controls -->
-    <div class="nav-row">
-      <button class="nav-btn" id="nav-start" title="Go to start">⏮</button>
-      <button class="nav-btn" id="nav-prev"  title="Previous">◀</button>
-      <button class="nav-btn" id="nav-next"  title="Next">▶</button>
-      <button class="nav-btn" id="nav-end"   title="Go to end">⏭</button>
-    </div>
-    <div class="game-ctrl-row">
-      <button class="gc-btn danger"  id="resign-btn">🏳 Resign</button>
-      <button class="gc-btn warn"    id="draw-btn">½ Draw</button>
-      <button class="gc-btn"         id="undo-btn">⟵ Undo</button>
-      <button class="gc-btn primary" id="new-game-btn">＋ New</button>
-    </div>
-
-    <!-- Extra -->
-    <div class="extra-row">
-      <button class="ex-btn" id="save-btn">💾 Save</button>
-      <button class="ex-btn" id="export-btn">📋 PGN</button>
-      <button class="ex-btn" id="fen-btn">🔗 FEN</button>
-      <button class="ex-btn" id="lib-btn">📚 Library</button>
-    </div>
-
-  </div>
-  <!-- /sidebar -->
-</div>
-<!-- /game-app -->
-
-<!-- ══ MODALS ══ -->
-<div id="fen-modal" class="modal"><div class="mc">
-  <span class="mc-close" data-modal="fen-modal">✕</span>
-  <h3>FEN Position</h3>
-  <textarea id="fen-input" class="mc-area" rows="3" placeholder="Paste FEN…"></textarea>
-  <div class="mc-row">
-    <button class="mc-btn"           id="confirm-fen">Load</button>
-    <button class="mc-btn secondary" id="copy-fen">Copy current FEN</button>
-  </div>
-</div></div>
-
-<div id="save-modal" class="modal"><div class="mc">
-  <span class="mc-close" data-modal="save-modal">✕</span>
-  <h3>Save Game</h3>
-  <input type="text" id="game-name" class="mc-inp" placeholder="Game name…">
-  <button class="mc-btn" id="confirm-save">Save</button>
-</div></div>
-
-<div id="library-modal" class="modal"><div class="mc wide">
-  <span class="mc-close" data-modal="library-modal">✕</span>
-  <h3>Game Library</h3>
-  <div id="lib-list" class="lib-list"></div>
-</div></div>
-
-<!-- Audio -->
-<audio id="snd-move"    src="chess/audio/move.mp3"    preload="auto"></audio>
-<audio id="snd-capture" src="chess/audio/capture.mp3" preload="auto"></audio>
-<audio id="snd-castle"  src="chess/audio/castle.mp3"  preload="auto"></audio>
-<audio id="snd-check"   src="chess/audio/check.mp3"   preload="auto"></audio>
-<audio id="snd-promote" src="chess/audio/promote.mp3" preload="auto"></audio>
-<audio id="snd-gameend" src="chess/audio/gameend.mp3" preload="auto"></audio>
-
-<script src="chess/Chess.js"></script>
 </body>
 </html>
