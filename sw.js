@@ -1,4 +1,4 @@
-const CACHE_NAME = 'omargameplay-v1.4'; // Updated version
+const CACHE_NAME = 'omargameplay-v1.5'; // Updated version
 const FONT_CACHE = 'fonts-cache-v1';
 
 const urlsToCache = [
