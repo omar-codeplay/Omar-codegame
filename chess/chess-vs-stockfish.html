@@ -298,6 +298,12 @@
     .last-move-light { background: rgba(244,193,67,0.30) !important; }
     .last-move-dark  { background: rgba(244,193,67,0.20) !important; }
 
+    /* ── PREVENT SCROLL WHILE DRAGGING PIECES ON MOBILE ─────── */
+    #gameBoard,
+    #gameBoard * {
+      touch-action: none;
+    }
+
     /* ── CAPTURE STRIP ───────────────────────────────────────── */
     .capture-strip {
       display: flex;
@@ -913,6 +919,11 @@
     // ============================================================
     updateInfoPanel();
     initEngine();
+
+    // Prevent page scroll while dragging pieces on mobile
+    document.getElementById('gameBoard').addEventListener('touchmove', e => {
+      e.preventDefault();
+    }, { passive: false });
   </script>
 </body>
 </html>
