@@ -13,7 +13,7 @@
 
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #0a0a0f 0%, #1a0a1f 50%, #0a0a1a 100%);
+      background: #040303;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -275,6 +275,47 @@
     .glow-text {
       text-shadow: 0 0 10px cyan;
     }
+
+    /* Scoreboard */
+    .scoreboard {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 15px;
+      border: 1px solid rgba(0, 255, 255, 0.2);
+    }
+    .score-item {
+      text-align: center;
+    }
+    .score-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary, #aaccff);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .score-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #00e5ff;
+      text-shadow: 0 0 10px cyan;
+    }
+    .score-value.draws {
+      color: #ff44e6;
+      text-shadow: 0 0 10px #ff44e6;
+    }
+    .score-value.o-score {
+      color: #ff44e6;
+      text-shadow: 0 0 10px #ff44e6;
+    }
+
+    /* Win highlight on cells */
+    .cell.win-highlight {
+      box-shadow: 0 0 25px #00e5ff, inset 0 0 25px rgba(0, 229, 255, 0.3);
+      transform: scale(1.05);
+      border: 2px solid #00e5ff;
+    }
   </style>
 </head>
 <body>
@@ -289,6 +330,13 @@
   </div>
 
   <div class="control-panel">
+    <div class="section-title">✦ SCORE ✦</div>
+    <div class="scoreboard">
+      <div class="score-item"><div class="score-label">X</div><div class="score-value" id="scoreX">0</div></div>
+      <div class="score-item"><div class="score-label">DRAW</div><div class="score-value draws" id="scoreDraw">0</div></div>
+      <div class="score-item"><div class="score-label">O</div><div class="score-value o-score" id="scoreO">0</div></div>
+    </div>
+
     <div class="section-title">✦ GAME MODE ✦</div>
     <div class="mode-selector">
       <div class="mode-btn active" data-mode="ai">VS AI</div>
@@ -314,6 +362,27 @@
   (function(){
     "use strict";
 
+    // Audio
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTone(freq, duration = 0.1, type = 'sine') {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.value = freq;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.01);
+      gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration + 0.05);
+    }
+    function playClick() { playTone(600, 0.08, 'square'); }
+    function playWin() { [523, 659, 784].forEach((f,i) => setTimeout(() => playTone(f,0.12,'triangle'), i*120)); }
+    function playLose() { playTone(200, 0.4, 'sawtooth'); }
+    function playDraw() { playTone(440, 0.15, 'sine'); }
+
     // Game state
     let board = ['', '', '', '', '', '', '', '', ''];
     let currentPlayer = 'X';
@@ -322,6 +391,10 @@
     let playerMark = 'X'; // 'X' or 'O'
     let aiMark = 'O';
     let aiTimeout = null;
+    let winCells = null;
+
+    // Score
+    let scores = JSON.parse(localStorage.getItem('tictactoe_scores') || '{"X":0,"O":0,"draw":0}');
 
     // DOM elements
     const grid = document.getElementById('boardGrid');
@@ -331,6 +404,18 @@
     const modeBtns = document.querySelectorAll('.mode-btn');
     const markBtns = document.querySelectorAll('.mark-btn');
     const resetBtn = document.getElementById('resetBtn');
+    const scoreEls = {
+      X: document.getElementById('scoreX'),
+      O: document.getElementById('scoreO'),
+      draw: document.getElementById('scoreDraw')
+    };
+
+    function updateScoreDisplay() {
+      scoreEls.X.textContent = scores.X;
+      scoreEls.O.textContent = scores.O;
+      scoreEls.draw.textContent = scores.draw;
+    }
+    updateScoreDisplay();
 
     // Winning combinations
     const winPatterns = [
@@ -380,6 +465,7 @@
       const cell = grid.children[index];
       cell.className = 'cell filled';
       cell.setAttribute('data-mark', currentPlayer);
+      playClick();
 
       // Check for winner
       const winner = checkWinner();
@@ -476,7 +562,21 @@
     }
 
     function checkWinner() {
-      return checkWinnerOnBoard(board);
+      const winP = checkWinnerOnBoard(board);
+      if (winP && winP !== 'draw') {
+        winCells = winPatterns.find(p => board[p[0]] === winP && board[p[1]] === winP && board[p[2]] === winP);
+      } else {
+        winCells = null;
+      }
+      return winP;
+    }
+
+    function highlightWinCells() {
+      if (!winCells) return;
+      winCells.forEach(i => {
+        const cell = grid.children[i];
+        if (cell) cell.classList.add('win-highlight');
+      });
     }
 
     function endGame(result) {
@@ -488,12 +588,26 @@
       }
 
       let message = '';
-      if (result === 'X') message = '✖ X WINS! ✖';
-      else if (result === 'O') message = '◉ O WINS! ◉';
-      else message = '⚡ DRAW ⚡';
+      if (result === 'X') {
+        message = '✖ X WINS! ✖';
+        scores.X++;
+        playWin();
+      } else if (result === 'O') {
+        message = '◉ O WINS! ◉';
+        scores.O++;
+        playWin();
+      } else {
+        message = '⚡ DRAW ⚡';
+        scores.draw++;
+        playDraw();
+      }
+
+      localStorage.setItem('tictactoe_scores', JSON.stringify(scores));
+      updateScoreDisplay();
 
       winnerText.textContent = message;
       winnerOverlay.classList.add('show');
+      highlightWinCells();
     }
 
     function updateTurnIndicator() {
@@ -512,6 +626,7 @@
       board = ['', '', '', '', '', '', '', '', ''];
       currentPlayer = 'X';
       gameActive = true;
+      winCells = null;
       
       // Hide winner overlay
       winnerOverlay.classList.remove('show');

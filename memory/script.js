@@ -3,12 +3,19 @@ const resetButton = document.getElementById('reset-button');
 const triesDisplay = document.getElementById('tries');
 const levelSelect = document.getElementById('level-select');
 const hintButton = document.getElementById('hint-button');
+const timerDisplay = document.getElementById('timerDisplay');
+const messageOverlay = document.getElementById('messageOverlay');
+const messageBox = document.getElementById('messageBox');
 let cards = [];
 let flippedCards = [];
 let matchedCards = [];
 let tries = 0;
 let level = 4;
 let maxTries = 10;
+
+let timerInterval = null;
+let elapsed = 0;
+let gameActive = false;
 
 // audio setup
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -60,7 +67,7 @@ levelSelect.addEventListener('change', (event) => {
     createBoard();
 });
 
-resetButton.addEventListener('click', () => { createBoard(); playTone(261.63, 0.15, 'sawtooth'); });
+resetButton.addEventListener('click', () => { messageOverlay.style.display = 'none'; createBoard(); playTone(261.63, 0.15, 'sawtooth'); });
 
 function generateCards(level) {
     const cardValues = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
@@ -75,7 +82,40 @@ function shuffle(array) {
     }
 }
 
+function formatTime(s) {
+    const m = String(Math.floor(s / 60)).padStart(2, '0');
+    const sec = String(s % 60).padStart(2, '0');
+    return `${m}:${sec}`;
+}
+
+function startTimer() {
+    stopTimer();
+    elapsed = 0;
+    timerDisplay.textContent = '00:00';
+    timerInterval = setInterval(() => {
+        elapsed++;
+        timerDisplay.textContent = formatTime(elapsed);
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+}
+
+function showMessage(icon, title, msg) {
+    messageOverlay.style.display = 'flex';
+    messageBox.innerHTML = `
+        <div style="font-size:48px;margin-bottom:12px">${icon}</div>
+        <div style="font-size:22px;font-weight:700;margin-bottom:8px">${title}</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:6px">${msg}</div>
+        <button onclick="this.closest('.message-overlay').style.display='none'" style="margin-top:20px;padding:12px 28px;border-radius:8px;border:1px solid rgba(129,182,76,0.4);background:rgba(129,182,76,0.12);color:#81b64c;font-size:14px;font-weight:700;cursor:pointer">Play Again</button>
+    `;
+}
+
 function createBoard() {
+    stopTimer();
+    gameActive = true;
     cards = generateCards(level);
     shuffle(cards);
     gameBoard.innerHTML = '';
@@ -100,10 +140,12 @@ function createBoard() {
         gameBoard.appendChild(cardElement);
     });
     tries = maxTries;
-    triesDisplay.textContent = `Tries: ${tries}`;
+    triesDisplay.textContent = tries;
     flippedCards = [];
     matchedCards = [];
     playTone(329.63, 0.2, 'triangle'); // start board sound
+    showMessage('🧠', 'Ready!', `Match all pairs. You have ${maxTries} tries.`);
+    messageOverlay.addEventListener('click', e => { if (e.target === messageOverlay) messageOverlay.style.display = 'none'; }, {once: true});
 }
 
 function handleCardClick(event) {
@@ -111,7 +153,12 @@ function handleCardClick(event) {
     const card = cardElement.dataset.card;
     const index = cardElement.dataset.index;
 
+    if (!gameActive) return;
     if (flippedCards.length < 2 && !cardElement.classList.contains('flipped') && !matchedCards.includes(index)) {
+        // Start timer on first click
+        if (flippedCards.length === 0 && matchedCards.length === 0) {
+            startTimer();
+        }
         cardElement.classList.add('flipped');
         playFlip();
         flippedCards.push({ card, index });
@@ -132,9 +179,11 @@ function checkForMatch() {
         flippedCards = [];
         playMatch();
         if (matchedCards.length === cards.length) {
+            gameActive = false;
+            stopTimer();
             setTimeout(() => {
                 playWin();
-                alert('You win!');
+                showMessage('🎉', 'You Win!', `All pairs matched in ${formatTime(elapsed)} with ${maxTries - tries} tries used.`);
             }, 500);
         }
     } else {
@@ -150,17 +199,18 @@ function checkForMatch() {
             flippedCards = [];
         }, 1000);
         tries--;
-        triesDisplay.textContent = `Tries: ${tries}`;
+        triesDisplay.textContent = tries;
     }
 
     if (tries <= 0) {
+        gameActive = false;
+        stopTimer();
         setTimeout(() => {
             playLose();
             gameBoard.classList.add('shake');
             setTimeout(() => gameBoard.classList.remove('shake'), 400);
-            alert('You lose!');
+            showMessage('💔', 'Game Over', 'You ran out of tries. Try again!');
         }, 500);
-        createBoard();
     }
 }
 
@@ -211,8 +261,8 @@ function revealMatchingCards() {
         firstMatch[0].classList.add('flipped', 'hint');
         firstMatch[1].classList.add('flipped', 'hint');
         setTimeout(() => {
-            firstMatch[0].classList.remove('hint');
-            firstMatch[1].classList.remove('hint');
+            firstMatch[0].classList.remove('hint', 'flipped');
+            firstMatch[1].classList.remove('hint', 'flipped');
         }, 2000);
     }
 }

@@ -1,100 +1,157 @@
+:root {
+  --bg: #040303;
+  --surface: #1e1c19;
+  --surface2: #272420;
+  --border: #3a3835;
+  --green: #81b64c;
+  --blue: #4f85c9;
+  --yellow: #f4c143;
+  --red: #e74c3c;
+  --text: #e8e4dc;
+  --text2: #8a8278;
+  --radius: 12px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-    margin: 0;
-    padding: 0;
-    color: #222;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
 h1 {
-    margin-top: 20px;
-    color: #333;
+  margin-bottom: 8px;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, var(--red), var(--yellow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+  letter-spacing: 3px;
 }
 
-#game-board {
-    display: inline-block;
-    margin: 20px auto;
-    border: 2px solid #333;
-    background-color: #2196f3; /* blue background simulating board */
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    border-radius: 12px;
-    padding: 10px;
-}
-
-.row {
-    display: flex;
-}
-
-.cell {
-    width: 60px;
-    height: 60px;
-    margin: 4px;
-    border-radius: 50%;
-    border: 2px solid #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    background-color: #e0e0e0;
-    transition: background-color 0.3s, transform 0.3s;
-    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-}
-
-.cell[data-player="1"] {
-    background-color: red;
-}
-
-.cell[data-player="2"] {
-    background-color: blue;
-}
-
-/* drop animation */
-.cell.drop {
-    animation: drop 0.4s ease;
-}
-
-@keyframes drop {
-    from { transform: translateY(-150px); }
-    to { transform: translateY(0); }
-}
-
-/* highlight column when user hovers */
-.cell.hover {
-    background-color: #fff !important;
-    transform: scale(1.1);
+.subtitle {
+  color: var(--text2);
+  margin-bottom: 20px;
+  font-size: 1rem;
 }
 
 #status {
-    margin: 20px;
-    font-size: 1.5em;
-    color: #fff;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  margin: 16px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 12px 24px;
+  min-width: 250px;
+}
+
+#game-board {
+  display: inline-block;
+  margin: 10px auto;
+  background: #1e1c19;
+  border-radius: var(--radius);
+  padding: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(79, 133, 201, 0.15);
+  border: 1px solid var(--border);
+}
+
+.row {
+  display: flex;
+}
+
+.cell {
+  width: clamp(40px, 10vw, 70px);
+  height: clamp(40px, 10vw, 70px);
+  margin: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: #272420;
+  border: 2px solid rgba(79, 133, 201, 0.25);
+  transition: background-color 0.25s, transform 0.15s, box-shadow 0.25s;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.cell[data-player="1"] {
+  background: radial-gradient(circle at 35% 35%, #ff6b6b, #c0392b);
+  border-color: #a93226;
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.4), 0 0 12px rgba(231, 76, 60, 0.5);
+}
+
+.cell[data-player="2"] {
+  background: radial-gradient(circle at 35% 35%, #5dade2, #2980b9);
+  border-color: #1f618d;
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.4), 0 0 12px rgba(52, 152, 219, 0.5);
+}
+
+.cell.hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(79, 133, 201, 0.4);
+}
+
+.cell.drop {
+  animation: drop 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes drop {
+  from { transform: translateY(-200px); opacity: 0.5; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.cell.win {
+  animation: pulseGlow 0.6s ease infinite alternate;
+}
+
+@keyframes pulseGlow {
+  from { box-shadow: 0 0 15px rgba(244, 193, 67, 0.6); transform: scale(1); }
+  to { box-shadow: 0 0 30px rgba(244, 193, 67, 0.9); transform: scale(1.1); }
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
 }
 
 #reset-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    cursor: pointer;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 #reset-button:hover {
-    background-color: #555;
+  background: var(--surface2);
+  border-color: var(--green);
+  color: var(--green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(129, 182, 76, 0.3);
 }
 
-/* responsive adjustments */
 @media (max-width: 600px) {
-    .cell {
-        width: 40px;
-        height: 40px;
-        margin: 2px;
-    }
-    #status {
-        font-size: 1.2em;
-    }
+  .cell { width: 40px; height: 40px; margin: 2px; }
+  #game-board { padding: 6px; }
+  h1 { font-size: 1.8rem; }
+  #status { font-size: 1rem; padding: 10px 16px; }
 }

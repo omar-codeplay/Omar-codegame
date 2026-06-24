@@ -170,7 +170,7 @@ function fmtSecs(s) {
 function pieceTheme(piece) {
   const color = piece[0] === 'w' ? 'white' : 'black';
   const type  = PIECE_NAMES[piece[1].toLowerCase()];
-  return `chess/images/${color}-${type}.png`;
+  return `images/${color}-${type}.png`;
 }
 
 // ── SOUND ──────────────────────────────────────────────────────────────────
@@ -336,11 +336,12 @@ function launchGame(pWhite, pBlack, tc) {
 
 // ── DRAG / DROP ────────────────────────────────────────────────────────────
 function _onDragStart(source, piece) {
+  if (!_gameActive || _chess.game_over() || _viewIdx !== -1 || piece[0] !== _chess.turn()) {
+    _isDragging = false;
+    return false;
+  }
   _isDragging = true;
   _clearSel();
-  if (!_gameActive || _chess.game_over()) return false;
-  if (_viewIdx !== -1) return false;
-  if (piece[0] !== _chess.turn()) return false;
   _showDots(source);
   return true;
 }
@@ -459,7 +460,7 @@ function _openPromo(color) {
   ['q','r','b','n'].forEach(p => {
     const btn = document.createElement('button');
     btn.className = 'promo-piece';
-    btn.innerHTML = `<img src="chess/images/${col}-${PIECE_NAMES[p]}.png" alt="${p}">`;
+    btn.innerHTML = `<img src="images/${col}-${PIECE_NAMES[p]}.png" alt="${p}">`;
     btn.addEventListener('click', () => {
       $('#promo-overlay').style.display = 'none';
       const mv = _chess.move({ from: _promoFrom, to: _promoTo, promotion: p });

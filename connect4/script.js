@@ -16,6 +16,8 @@ const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 resetButton.addEventListener('click', resetGame);
 
+let winCells = []; // track winning cells for highlighting
+
 
 function initBoard() {
     board = [];
@@ -51,6 +53,11 @@ function renderBoard() {
                 cellDiv.classList.add('drop');
             }
 
+            // add win highlight
+            if (winCells && winCells.some(w => w.row == row && w.col == col)) {
+                cellDiv.classList.add('win');
+            }
+
             cellDiv.addEventListener('click', handleCellClick);
             // highlight column on hover
             cellDiv.addEventListener('mouseover', () => highlightColumn(col));
@@ -68,9 +75,16 @@ function handleCellClick(event) {
     const col = event.target.dataset.col;
     if (dropDisc(col)) {
         if (checkWin()) {
-            statusDiv.textContent = `Player ${currentPlayer} wins!`;
+            const player = currentPlayer === PLAYER1 ? '1' : '2';
+            statusDiv.textContent = `🎉 Player ${player} wins!`;
+            statusDiv.style.color = currentPlayer === PLAYER1 ? '#e74c3c' : '#3498db';
             disableBoard();
             playWin();
+        } else if (board.every(row => row.every(cell => cell !== EMPTY))) {
+            statusDiv.textContent = "🤝 It's a draw!";
+            statusDiv.style.color = '#8a8278';
+            disableBoard();
+            playTone(440, 0.2, 'sine');
         } else {
             switchPlayer();
             updateStatus();
@@ -83,6 +97,7 @@ function dropDisc(col) {
         if (board[row][col] === EMPTY) {
             board[row][col] = currentPlayer;
             lastMove = { row, col };
+            winCells = [];
             renderBoard();
             playDrop();
             return true;
@@ -94,15 +109,31 @@ function dropDisc(col) {
 function checkWin() {
     for (let row = 0; row < ROWS; row++) {
         for (let col = 0; col < COLS; col++) {
-            if (checkLine(row, col, 1, 0) || // Horizontal
-                checkLine(row, col, 0, 1) || // Vertical
-                checkLine(row, col, 1, 1) || // Diagonal down-right
-                checkLine(row, col, 1, -1)) { // Diagonal down-left
+            const result = checkLineFull(row, col, 1, 0) || // Horizontal
+                checkLineFull(row, col, 0, 1) || // Vertical
+                checkLineFull(row, col, 1, 1) || // Diagonal down-right
+                checkLineFull(row, col, 1, -1);  // Diagonal down-left
+            if (result) {
+                winCells = result;
                 return true;
             }
         }
     }
     return false;
+}
+
+function checkLineFull(row, col, rowDir, colDir) {
+    const cells = [];
+    for (let i = 0; i < 4; i++) {
+        let r = row + i * rowDir;
+        let c = col + i * colDir;
+        if (r >= 0 && r < ROWS && c >= 0 && c < COLS && board[r][c] === currentPlayer) {
+            cells.push({ row: r, col: c });
+        } else {
+            break;
+        }
+    }
+    return cells.length === 4 ? cells : null;
 }
 
 function checkLine(row, col, rowDir, colDir) {
@@ -168,6 +199,9 @@ function disableBoard() {
 
 function resetGame() {
     currentPlayer = PLAYER1;
+    winCells = [];
+    gameBoard.style.pointerEvents = 'auto';
+    statusDiv.style.color = '';
     initBoard();
     playReset();
 }

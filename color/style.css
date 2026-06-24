@@ -1,105 +1,141 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+:root {
+  --bg: #040303;
+  --surface: #1e1c19;
+  --border: #3a3835;
+  --green: #81b64c;
+  --blue: #4f85c9;
+  --text: #e8e4dc;
+  --text2: #8a8278;
 }
 
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  padding: 50px;
-  color: #333;
+  padding: 40px 20px;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 h1 {
   font-size: 3rem;
-  margin-bottom: 30px;
-  color: #333;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #4caf50, #f44336, #ffeb3b, #2196f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+p {
+  color: var(--text2);
+  margin-bottom: 20px;
 }
 
 #game-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 30px;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .color-btn {
-  width: 100px;
-  height: 100px;
+  width: clamp(70px, 18vw, 120px);
+  height: clamp(70px, 18vw, 120px);
   border-radius: 50%;
-  margin: 10px;
+  margin: 6px;
   cursor: pointer;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   transition: transform 0.2s, filter 0.2s, box-shadow 0.2s;
-  background-repeat: no-repeat;
-  background-size: cover;
+  border: 3px solid transparent;
 }
 
 #green {
-  background: radial-gradient(circle at center, #4caf50 0%, #2e7d32 100%);
+  background: radial-gradient(circle at 35% 35%, #66bb6a 0%, #2e7d32 100%);
+  border-color: rgba(76, 175, 80, 0.3);
 }
 
 #red {
-  background: radial-gradient(circle at center, #f44336 0%, #c62828 100%);
+  background: radial-gradient(circle at 35% 35%, #ef5350 0%, #c62828 100%);
+  border-color: rgba(244, 67, 54, 0.3);
 }
 
 #yellow {
-  background: radial-gradient(circle at center, #ffeb3b 0%, #fbc02d 100%);
+  background: radial-gradient(circle at 35% 35%, #ffd54f 0%, #fbc02d 100%);
+  border-color: rgba(255, 235, 59, 0.3);
 }
 
 #blue {
-  background: radial-gradient(circle at center, #2196f3 0%, #1565c0 100%);
+  background: radial-gradient(circle at 35% 35%, #42a5f5 0%, #1565c0 100%);
+  border-color: rgba(33, 150, 243, 0.3);
 }
 
 .color-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
 
 .color-btn.active {
-  transform: scale(1.15);
-  filter: brightness(1.3);
-  box-shadow: 0 0 20px rgba(255,255,255,0.7);
+  transform: scale(1.12);
+  filter: brightness(1.4);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+  border-color: white;
 }
 
 #game-status {
-  margin-top: 20px;
-  font-size: 1.2rem;
-  color: #333;
+  margin: 16px 0;
+  font-size: 1.1rem;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 12px 24px;
+  min-width: 280px;
 }
 
 #start-btn {
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 1.2rem;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 25px;
+  margin-top: 16px;
+  padding: 14px 32px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 50px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 #start-btn:hover {
-  transform: scale(1.05);
-}
-
-#start-btn:hover {
-  background-color: #45a049;
+  border-color: var(--green);
+  color: var(--green);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(129, 182, 76, 0.3);
 }
 
 #status {
   font-weight: bold;
 }
 
+#highScore {
+  font-weight: 700;
+  color: var(--blue);
+  font-size: 1.1rem;
+}
+
 #level-message {
   font-size: 24px;
   font-weight: bold;
-  color: green;
   text-align: center;
-  margin-top: 20px;
-  opacity: 0; /* Initially hidden */
+  margin-top: 16px;
+  opacity: 0;
   transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-  display: none; /* Make sure it's hidden initially */
+  display: none;
 }
 
 #level-message.show {
@@ -108,7 +144,6 @@ h1 {
   transform: scale(1.1);
 }
 
-/* shake effect for wrong answer */
 @keyframes shake {
   0% { transform: translateX(0); }
   25% { transform: translateX(-5px); }
@@ -121,36 +156,21 @@ h1 {
   animation: shake 0.4s;
 }
 
-#level-message.show {
-  opacity: 1; /* Fade in the message */
-  display: block; /* Make it visible */
-}
-
 .my-text {
-  font-size: 1.5rem;
-  margin-top: 20px;
-  color: #333;
+  font-size: 1.3rem;
+  margin-top: 12px;
+  color: var(--text);
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
   display: none;
 }
+
 .my-text.show {
   opacity: 1;
   display: block;
-  transition: opacity 0.5s ease-in-out;
 }
 
-/* responsive */
 @media (max-width: 600px) {
-  .color-btn {
-    width: 70px;
-    height: 70px;
-    margin: 6px;
-  }
-  h1 {
-    font-size: 2.2rem;
-  }
-  #level-message {
-    font-size: 20px;
-  }
+  .color-btn { width: 70px; height: 70px; margin: 4px; }
+  h1 { font-size: 2.2rem; }
 }

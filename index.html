@@ -9,7 +9,7 @@
     <title>مجموعة ألعاب للاعبين - XO، شطرنج، كونكت 4، بكاسه، فورتريس | Omar GamePlay</title>
     <meta name="title" content="مجموعة ألعاب للاعبين - XO، شطرنج، كونكت 4، بكاسه، فورتريس | Omar GamePlay">
     <meta name="description"
-        content="استمتع بألعاب ثنائية مع أصدقائك على نفس الجهاز. اختر من بين XO، الشطرنج، كونكت 4، لعبة الذاكرة، المكعبات، كروس رود، اختبار الذكاء، بكاسه (لعبة الجاسوس)، وفورتريس ديويل. العب مجاناً بدون تحميل.">
+        content="استمتع بألعاب ثنائية مع أصدقائك على نفس الجهاز. اختر من بين XO، الشطرنج، كونكت 4، لعبة الذاكرة، المكعبات، كروس رود، اختبار الذكاء، بكاسه (لعبة الجاسوس)، سودوكو، وفورتريس ديويل. العب مجاناً بدون تحميل.">
     <meta name="keywords"
         content="ألعاب ثنائية, العب مع صديق, XO, شطرنج, كونكت 4, ذاكرة, مكعبات, كروس رود, اختبار الذكاء, بكاسه, لعبة الجاسوس, فورتريس, Omar GamePlay,OmarCodePlay,Omar CodePlay,ألعاب مجانية, ألعاب بدون تحميل, ألعاب على نفس الجهاز">
     <meta name="author" content="Omar CodePlay">
@@ -21,7 +21,7 @@
     <meta property="og:url" content="https://omar-gameplay.netlify.app/">
     <meta property="og:title" content="مجموعة ألعاب للاعبين - العب مع صديقك على نفس الجهاز">
     <meta property="og:description"
-        content="9 ألعاب ثنائية ممتعة: XO، شطرنج، كونكت 4، بكاسه، فورتريس وأكثر. العب مجاناً بدون تحميل.">
+        content="10 ألعاب ثنائية ممتعة: XO، شطرنج، كونكت 4، بكاسه، سودوكو، فورتريس وأكثر. العب مجاناً بدون تحميل.">
     <meta property="og:image" content="https://omar-gameplay.netlify.app/image/og-preview.jpg">
 
     <!-- Twitter -->
@@ -29,7 +29,7 @@
     <meta property="twitter:url" content="https://omar-gameplay.netlify.app/">
     <meta property="twitter:title" content="مجموعة ألعاب للاعبين - العب مع صديقك على نفس الجهاز">
     <meta property="twitter:description"
-        content="9 ألعاب ثنائية ممتعة: XO، شطرنج، كونكت 4، بكاسه، فورتريس وأكثر. العب مجاناً بدون تحميل.">
+        content="10 ألعاب ثنائية ممتعة: XO، شطرنج، كونكت 4، بكاسه، سودوكو، فورتريس وأكثر. العب مجاناً بدون تحميل.">
     <meta property="twitter:image" content="https://omar-gameplay.netlify.app/image/og-preview.jpg">
 
     <!-- Favicon -->
@@ -45,8 +45,8 @@
         "@context": "https://schema.org",
         "@type": "ItemList",
         "name": "مجموعة ألعاب ثنائية",
-        "description": "9 ألعاب يمكن لعبها على نفس الجهاز مع صديق.",
-        "numberOfItems": 9,
+        "description": "10 ألعاب يمكن لعبها على نفس الجهاز مع صديق.",
+        "numberOfItems": 10,
         "itemListElement": [
             {
                 "@type": "ListItem",
@@ -101,6 +101,12 @@
                 "position": 9,
                 "name": "Fortress Duel",
                 "url": "https://omar-codeplay.netlify.app/fortress.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 10,
+                "name": "Sudoku",
+                "url": "https://omar-codeplay.netlify.app/sudoku.html"
             }
         ]
     }
@@ -121,24 +127,24 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
-            background: linear-gradient(135deg, #00b2ff 0%, #0011ff 100%);
+            background: #040303;
         }
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.95);
+            background: #1e1c19;
             padding: 40px;
             border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             max-width: 1000px;
             width: 100%;
-            backdrop-filter: blur(5px);
+            border: 1px solid #3a3835;
         }
 
         h1 {
             margin-bottom: 30px;
             font-size: 2.5rem;
-            color: #333;
+            color: #e8e4dc;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -170,8 +176,9 @@
             background-position: center;
             overflow: hidden;
             text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.8);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            background-color: #005eff;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #3a3835;
+            background-color: #2a2825;
             /* fallback color */
         }
 
@@ -183,15 +190,15 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(1.5px);
-            -webkit-backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(1.5px);
             transition: all 0.3s ease;
             z-index: 1;
         }
 
         .button:hover::before {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(129, 182, 76, 0.15);
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
         }
@@ -242,19 +249,24 @@
             background-image: url('image/bakasa.png');
         }
 
-        .button.fortress {
-            background-image: url('image/fortress.png');
-        }
+.button.fortress {
+    background-image: url('image/fortress.png');
+}
+
+.button.sudoku {
+    background-image: url('image/IQ.png');
+    background-color: #5c6bc0;
+}
 
         footer {
             margin-top: 30px;
             text-align: center;
-            color: white;
+            color: #8a8278;
             font-size: 1rem;
         }
 
         footer a {
-            color: #ffd700;
+            color: #f4c143;
             text-decoration: none;
             font-weight: bold;
         }

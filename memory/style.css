@@ -1,137 +1,217 @@
+:root {
+  --bg: #040303;
+  --surface: #1e1c19;
+  --surface2: #272420;
+  --border: #3a3835;
+  --green: #81b64c;
+  --blue: #4f85c9;
+  --yellow: #f4c143;
+  --red: #c0392b;
+  --text: #e8e4dc;
+  --text2: #8a8278;
+  --radius: 10px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
-    color: #222;
-    min-height: 100vh;
-    margin: 0;
-    padding: 16px;
-    box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 20px;
 }
 
 h1 {
-    color: #fff;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    text-align: center;
-    font-size: clamp(1.8rem, 6vw, 2.8rem);
-    margin: 0 0 10px 0;
+  background: linear-gradient(135deg, var(--green), var(--blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  margin-bottom: 6px;
 }
 
+p {
+  color: var(--text2);
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Stats row */
+.stats-row {
+  display: flex;
+  gap: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 10px 24px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text2);
+  font-weight: 600;
+}
+
+#level-select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#timerDisplay, #tries {
+  font-family: 'Courier New', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--green);
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Game board */
 #game-board {
-    display: grid;
-    grid-gap: 10px;
-    margin: 20px auto;
-    padding: 12px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 600px;           /* Reduced from 900px to keep cards smaller on PC */
-    box-sizing: border-box;
-    justify-content: center;
+  display: grid;
+  grid-gap: 10px;
+  margin: 10px auto;
+  padding: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  box-sizing: border-box;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
+/* Card */
 .card {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background-color: #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(1.5rem, 5vw, 2.5rem);  /* Slightly reduced max font size */
-    cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
-    border-radius: 12px;
-    position: relative;
-    transform-style: preserve-3d;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
+  width: clamp(50px, 14vw, 80px);
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.2s;
+  border-radius: var(--radius);
+  position: relative;
+  transform-style: preserve-3d;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
-
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-}
-
-.card.flipped {
-    transform: rotateY(180deg);
+  transform: scale(1.05);
+  box-shadow: 0 0 15px rgba(79, 133, 201, 0.3);
 }
 
 .card .front,
 .card .back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 10px;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  font-weight: 700;
 }
 
 .card .front {
-    background-color: #fff;
-    transform: rotateY(180deg);
-    visibility: hidden;        /* hidden until flipped */
-}
-
-.card.flipped .front {
-    visibility: visible;       /* shown when flipped */
+  background: linear-gradient(135deg, #2a2a3a, #1a1a2a);
+  border: 2px solid var(--border);
+  transform: rotateY(180deg);
 }
 
 .card .back {
-    background-color: #ccc;
-    transform: rotateY(0deg);
+  background: linear-gradient(135deg, #3a3a5a, #2a2a4a);
+  border: 2px solid rgba(79, 133, 201, 0.4);
+  transform: rotateY(0deg);
+  box-shadow: inset 0 0 20px rgba(79, 133, 201, 0.1);
+}
+
+.card .back::after {
+  content: '?';
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  color: rgba(79, 133, 201, 0.3);
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
 }
 
 .card.matched .front {
-    background-color: #8f8;
-    box-shadow: 0 0 15px rgba(0,255,0,0.6);
+  background: linear-gradient(135deg, rgba(129, 182, 76, 0.3), rgba(129, 182, 76, 0.1));
+  border-color: var(--green);
+  box-shadow: 0 0 15px rgba(129, 182, 76, 0.4);
 }
 
 .card.unmatched .front {
-    background-color: #f88;
-    box-shadow: 0 0 15px rgba(255,0,0,0.6);
+  background: linear-gradient(135deg, rgba(192, 57, 43, 0.3), rgba(192, 57, 43, 0.1));
+  border-color: var(--red);
+  box-shadow: 0 0 15px rgba(192, 57, 43, 0.4);
 }
 
-#tries {
-    margin-top: 20px;
-    font-size: clamp(1.2rem, 4vw, 1.8rem);
-    color: #fff;
-    text-align: center;
+.card.hint .front {
+  border-color: var(--yellow);
+  box-shadow: 0 0 20px rgba(244, 193, 67, 0.6);
+}
+
+.btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  justify-content: center;
 }
 
 #reset-button, #hint-button {
-    margin-top: 20px;
-    padding: 12px 24px;
-    font-size: clamp(0.9rem, 3vw, 1.1rem);
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    width: auto;
-    min-width: 160px;
-    max-width: 90%;
-}
-
-#hint-button {
-    background-color: #ff9800;
-    margin-top: 10px;
+  padding: 12px 24px;
+  font-size: clamp(0.9rem, 3vw, 1rem);
+  font-weight: 700;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 #reset-button:hover {
-    background-color: #555;
-    transform: scale(1.05);
+  background: var(--surface2);
+  border-color: var(--green);
+  color: var(--green);
+  transform: translateY(-2px);
+}
+
+#hint-button {
+  background: rgba(244, 193, 67, 0.1);
+  border-color: rgba(244, 193, 67, 0.3);
+  color: var(--yellow);
 }
 
 #hint-button:hover {
-    background-color: #fb8c00;
-    transform: scale(1.05);
+  background: rgba(244, 193, 67, 0.2);
+  border-color: var(--yellow);
+  transform: translateY(-2px);
 }
 
 /* Shake animation */
@@ -147,31 +227,44 @@ h1 {
   animation: shake 0.4s;
 }
 
-/* Responsive adjustments */
+/* Message overlay */
+.message-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 21, 18, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.message-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 40px;
+  text-align: center;
+  max-width: 340px;
+  width: 88%;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* Responsive */
 @media (max-width: 700px) {
-    #game-board {
-        max-width: 100%;        /* On smaller screens, allow board to fill width */
-        grid-gap: 8px;
-        padding: 8px;
-    }
-    .card {
-        font-size: clamp(1.2rem, 4vw, 2rem);
-    }
+  #game-board { max-width: 100%; grid-gap: 6px; padding: 8px; }
+  .card { width: clamp(40px, 12vw, 65px); }
+  .stats-row { gap: 12px; padding: 8px 16px; }
 }
 
 @media (max-width: 480px) {
-    #game-board {
-        grid-gap: 6px;
-        padding: 6px;
-    }
-    .card {
-        font-size: 1.1rem;
-    }
-    #tries {
-        font-size: 1.2rem;
-    }
-    button {
-        padding: 10px 16px;
-        font-size: 0.9rem;
-    }
+  #game-board { grid-gap: 5px; padding: 6px; }
+  .card { width: clamp(36px, 15vw, 55px); }
+  .btn-row { flex-direction: column; align-items: center; }
+  #reset-button, #hint-button { width: 100%; max-width: 250px; }
 }

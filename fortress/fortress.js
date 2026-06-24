@@ -21,9 +21,26 @@ class FortressDuel {
         this.board[6][6] = 'blueKing';
     }
 
+    getLegalMoves() {
+        const moves = [];
+        const kingPos = this.currentPlayer === 'red' ? this.redPos : this.bluePos;
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                if (dr === 0 && dc === 0) continue;
+                const nr = kingPos.row + dr;
+                const nc = kingPos.col + dc;
+                if (nr >= 0 && nr < 7 && nc >= 0 && nc < 7 && this.board[nr][nc] === 'empty') {
+                    moves.push({ row: nr, col: nc });
+                }
+            }
+        }
+        return moves;
+    }
+
     renderBoard() {
         const boardEl = document.getElementById('board');
         boardEl.innerHTML = '';
+        const legalMoves = !this.gameOver ? this.getLegalMoves() : [];
         for (let r = 0; r < 7; r++) {
             for (let c = 0; c < 7; c++) {
                 const cell = document.createElement('div');
@@ -38,6 +55,8 @@ class FortressDuel {
                     cell.classList.add('red-king');
                 } else if (cellType === 'blueKing') {
                     cell.classList.add('blue-king');
+                } else if (legalMoves.some(m => m.row === r && m.col === c)) {
+                    cell.classList.add('legal-move');
                 }
 
                 boardEl.appendChild(cell);
@@ -135,13 +154,15 @@ class FortressDuel {
     }
 
     showWinner(player) {
-        const winnerName = player === 'red' ? 'الأحمر' : 'الأزرق';
-        setTimeout(() => {
-            alert(`🎉 الفائز هو ${winnerName} !`);
-        }, 50);
+        const winnerName = player === 'red' ? 'الأحمر (Red)' : 'الأزرق (Blue)';
+        const banner = document.getElementById('winnerBanner');
+        const text = document.getElementById('winnerText');
+        text.textContent = `🏆 الفائز هو ${winnerName}!`;
+        banner.style.display = 'block';
     }
 
     resetGame() {
+        document.getElementById('winnerBanner').style.display = 'none';
         this.board = [];
         this.currentPlayer = 'red';
         this.redPos = { row: 0, col: 0 };
@@ -155,5 +176,5 @@ class FortressDuel {
 
 // Start game
 window.addEventListener('load', () => {
-    new FortressDuel();
+    window.game = new FortressDuel();
 });

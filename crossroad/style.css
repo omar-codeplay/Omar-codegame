@@ -4,6 +4,7 @@ body {
   margin: 0;
   font-family: "Press Start 2P", cursive;
   font-size: 2em;
+  background: #040303;
   color: white;
 }
 button {
@@ -27,10 +28,18 @@ button {
   visibility: hidden;
 }
 #end button {
-  background-color: red;
+  background-color: #272420;
+  border: 1px solid #3a3835;
   padding: 20px 50px 20px 50px;
   font-family: inherit;
   font-size: inherit;
+  color: #e8e4dc;
+  transition: all 0.2s;
+}
+#end button:hover {
+  background-color: #3a3835;
+  border-color: #81b64c;
+  color: #81b64c;
 }
 #controlls {
   position: absolute;
@@ -50,8 +59,11 @@ button {
 }
 #controlls button {
   width: 100%;
-  background-color: white;
-  border: 1px solid lightgray;
+  background-color: #272420;
+  border: 1px solid #3a3835;
+}
+#controlls button:hover {
+  background-color: #3a3835;
 }
 #controlls button:first-of-type {
   grid-column: 1/-1;

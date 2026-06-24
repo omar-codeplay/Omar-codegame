@@ -5,6 +5,12 @@ let level = 0;
 let clickCount = 0;
 let gameStarted = false;
 let missedColor = null; // track color when user makes a mistake
+let highScore = parseInt(localStorage.getItem('coloriq_highscore') || '0');
+
+function updateHighScoreDisplay() {
+  const el = document.getElementById('highScore');
+  if (el) el.textContent = `🏆 Best: Level ${highScore}`;
+}
 
 // audio context for richer tones
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -63,6 +69,7 @@ function startGame() {
 
     playTone(523.25, 0.2, 'triangle'); // start sound
     showMyTexts();
+    updateHighScoreDisplay();
     nextSequence();
   }
 }
@@ -156,6 +163,11 @@ function checkAnswer(currentLevel) {
       }, 1000);
     }
   } else {
+    if (level > highScore) {
+      highScore = level;
+      localStorage.setItem('coloriq_highscore', String(highScore));
+      updateHighScoreDisplay();
+    }
     document.getElementById("status").textContent = `Game Over!`;
     missedColor = gamePattern[currentLevel];
     playError();
