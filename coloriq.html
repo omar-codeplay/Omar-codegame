@@ -1,36 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IQ Test</title>
+    <title>IQ Test | Omar GamePlay</title>
     <link rel="stylesheet" href="color/style.css" />
     <link rel="icon" href="image/logo-nobg.png"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="color/script.js" defer></script>
-  </head>
-  <body>
-    <h1>IQ Test</h1>
-    <p>Memorize and repeat the color sequence. Click a box to play—sounds and animations guide you.</p>
-    <div id="game-container">
-      <div class="color-btn" id="green"></div>
-      <div class="color-btn" id="red"></div>
-      <div class="color-btn" id="yellow"></div>
-      <div class="color-btn" id="blue"></div>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="top-bar">
+            <a href="index.html" class="back-link">← Back</a>
+            <h1>IQ Test</h1>
+            <div id="highScoreEl"></div>
+        </div>
+        <p>Memorize and repeat the color sequence</p>
+        <div id="game-container">
+            <div class="color-btn" id="green"></div>
+            <div class="color-btn" id="red"></div>
+            <div class="color-btn" id="yellow"></div>
+            <div class="color-btn" id="blue"></div>
+        </div>
+        <div id="game-status">
+            <p class="my-text" id="sequence">
+                Sequence: <span id="sequence-display">-</span>
+            </p>
+            <p class="my-text" id="clicks">
+                Clicks: <span id="click-count">0</span>
+            </p>
+            <p class="my-text" id="statusDisplay">
+                Status: <span id="statusText">Waiting...</span>
+            </p>
+        </div>
+        <button id="start-btn">Start Game</button>
+        <p id="highScore"></p>
+        <p id="level-message"></p>
     </div>
-    <div id="game-status">
-      <p class="my-text" id="sequence" style="display: none;">
-        Current Sequence: <span id="sequence-display">-</span>
-      </p>
-      <p class="my-text" id="clicks" style="display: none;">
-        Click Count: <span id="click-count">0</span>
-      </p>
-      <p class="my-text" id="status" style="display: none;">
-        Game Status: <span id="status">Waiting...</span>
-      </p>
-    </div>
-    <button id="start-btn">Start Game</button>
-    <p id="highScore" style="margin-top:10px;font-weight:700;color:#f4c143;"></p>
-    <p id="level-message" style="display: none;"></p>
-    <p style="font-size:0.9rem;color:#666;margin-top:15px;">Click "Start Game" when you are ready.</p>
-  </body>
+</body>
 </html>

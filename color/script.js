@@ -9,7 +9,7 @@ let highScore = parseInt(localStorage.getItem('coloriq_highscore') || '0');
 
 function updateHighScoreDisplay() {
   const el = document.getElementById('highScore');
-  if (el) el.textContent = `🏆 Best: Level ${highScore}`;
+  if (el) el.textContent = `Best: Level ${highScore}`;
 }
 
 // audio context for richer tones
@@ -64,7 +64,7 @@ function startGame() {
     gamePattern = [];
     userPattern = [];
     clickCount = 0;
-    document.getElementById("status").textContent = `Level ${level}`;
+    document.getElementById("statusDisplay").textContent = `Level ${level}`;
     document.getElementById("click-count").textContent = clickCount;
 
     playTone(523.25, 0.2, 'triangle'); // start sound
@@ -79,7 +79,7 @@ function nextSequence() {
   clickCount = 0;
   document.getElementById("click-count").textContent = clickCount;
   level++;
-  document.getElementById("status").textContent = `Level ${level}`;
+  document.getElementById("statusDisplay").textContent = `Level ${level}`;
 
   // Clear the sequence display at the start of each level
   document.getElementById("sequence-display").textContent = "-";
@@ -168,7 +168,7 @@ function checkAnswer(currentLevel) {
       localStorage.setItem('coloriq_highscore', String(highScore));
       updateHighScoreDisplay();
     }
-    document.getElementById("status").textContent = `Game Over!`;
+    document.getElementById("statusDisplay").textContent = `Game Over!`;
     missedColor = gamePattern[currentLevel];
     playError();
     // shake the container to emphasize mistake

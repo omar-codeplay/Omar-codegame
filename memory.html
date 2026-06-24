@@ -3,41 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Card Game</title>
+    <title>Memory Card Game | Omar GamePlay</title>
     <link rel="icon" href="image/logo-nobg.png"/>
     <link rel="stylesheet" href="memory/style.css">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3758016323496227"
-    crossorigin="anonymous"></script>
-    <!-- Google AdSense script -->
-    <script data-ad-client="pub-3758016323496227" asyncsrc="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Memory Card Game</h1>
-    <p>Flip two cards at a time. Match pairs before your tries run out.</p>
-    <div class="stats-row">
-      <div class="stat-item">
-        <span class="stat-label">Level</span>
-        <select id="level-select">
-            <option value="4">4x4</option>
-            <option value="8">6x5</option>
-        </select>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Time</span>
-        <span id="timerDisplay">00:00</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-label">Tries</span>
-        <span id="tries">0</span>
-      </div>
+    <div class="game-wrapper">
+        <div class="top-bar">
+            <a href="index.html" class="back-link">← Back</a>
+            <h1>Memory Cards</h1>
+            <div></div>
+        </div>
+        <p>Flip two cards at a time. Match pairs before your tries run out.</p>
+        <div class="stats-row">
+            <div class="stat-item">
+                <span class="stat-label">Level</span>
+                <select id="level-select">
+                    <option value="4">4×4</option>
+                    <option value="8">6×5</option>
+                </select>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-label">Time</span>
+                <span id="timerDisplay">00:00</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-label">Tries</span>
+                <span id="tries">0</span>
+            </div>
+        </div>
+        <div id="game-board"></div>
+        <div class="btn-row">
+            <button id="reset-button">New Game</button>
+            <button id="hint-button">Hint</button>
+        </div>
     </div>
-    <div id="game-board"></div>
-    <div class="btn-row">
-      <button id="reset-button">↻ New Game</button>
-      <button id="hint-button">💡 Hint</button>
-    </div>
+
     <div class="message-overlay" id="messageOverlay" style="display:none">
-      <div class="message-box" id="messageBox"></div>
+        <div class="message-box" id="messageBox"></div>
     </div>
 
     <script src="memory/script.js"></script>

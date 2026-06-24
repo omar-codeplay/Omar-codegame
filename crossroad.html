@@ -1,50 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Crossy Road Game Clone</title>
+    <title>Crossy Road | Omar GamePlay</title>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="crossroad/style.css" />
     <link rel="icon" href="image/logo-nobg.png"/>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="counter">0</div>
+    <div id="hud">
+      <div class="score-container">
+        <span class="score-label">SCORE</span>
+        <span id="counter">0</span>
+      </div>
+      <a href="index.html" class="back-home" title="Back to games">←</a>
+    </div>
 
     <div id="controlls">
       <div>
-        <button id="forward">
-          <svg width="30" height="30" viewBox="0 0 10 10">
-            <g transform="rotate(0, 5,5)">
-              <path d="M5,4 L7,6 L3,6 L5,4" />
-            </g>
+        <button id="forward" aria-label="Forward">
+          <svg width="24" height="24" viewBox="0 0 10 10">
+            <path d="M5,3 L8,7 L2,7 Z" fill="currentColor" />
           </svg>
         </button>
-        <button id="left">
-          <svg width="30" height="30" viewBox="0 0 10 10">
-            <g transform="rotate(-90, 5,5)">
-              <path d="M5,4 L7,6 L3,6 L5,4" />
-            </g>
+        <button id="left" aria-label="Left">
+          <svg width="24" height="24" viewBox="0 0 10 10">
+            <path d="M3,5 L7,2 L7,8 Z" fill="currentColor" />
           </svg>
         </button>
-        <button id="backward">
-          <svg width="30" height="30" viewBox="0 0 10 10">
-            <g transform="rotate(180, 5,5)">
-              <path d="M5,4 L7,6 L3,6 L5,4" />
-            </g>
+        <button id="backward" aria-label="Backward">
+          <svg width="24" height="24" viewBox="0 0 10 10">
+            <path d="M5,7 L2,3 L8,3 Z" fill="currentColor" />
           </svg>
         </button>
-        <button id="right">
-          <svg width="30" height="30" viewBox="0 0 10 10">
-            <g transform="rotate(90, 5,5)">
-              <path d="M5,4 L7,6 L3,6 L5,4" />
-            </g>
+        <button id="right" aria-label="Right">
+          <svg width="24" height="24" viewBox="0 0 10 10">
+            <path d="M7,5 L3,2 L3,8 Z" fill="currentColor" />
           </svg>
         </button>
       </div>
     </div>
 
     <div id="end">
-      <button id="retry">Retry</button>
+      <div class="game-over-box">
+        <h2>Game Over</h2>
+        <p class="final-score">Score: <span id="final-score">0</span></p>
+        <button id="retry">Play Again</button>
+      </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/99/three.min.js"></script>
     <script src="crossroad/script.js"></script>

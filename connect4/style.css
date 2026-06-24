@@ -15,7 +15,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
   text-align: center;
   background: var(--bg);
   color: var(--text);
@@ -25,43 +25,93 @@ body {
   align-items: center;
   justify-content: center;
   padding: 20px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(231,76,60,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(79,133,201,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.game-wrapper {
+  position: relative;
+  z-index: 1;
+  background: rgba(30,28,25,0.5);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(58,56,53,0.5);
+  border-radius: 30px;
+  padding: 30px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.back-link {
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 0.2s;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.back-link:hover {
+  color: var(--green);
+  background: rgba(129,182,76,0.1);
 }
 
 h1 {
-  margin-bottom: 8px;
-  font-size: 2.5rem;
+  font-size: 1.8rem;
+  font-weight: 800;
   background: linear-gradient(135deg, var(--red), var(--yellow));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
   text-transform: uppercase;
-  letter-spacing: 3px;
 }
 
 .subtitle {
   color: var(--text2);
   margin-bottom: 20px;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 #status {
-  margin: 16px 0;
-  font-size: 1.3rem;
+  margin: 16px auto;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 50px;
-  padding: 12px 24px;
-  min-width: 250px;
+  padding: 10px 24px;
+  min-width: 200px;
+  display: inline-block;
+  transition: all 0.3s;
 }
 
 #game-board {
   display: inline-block;
   margin: 10px auto;
-  background: #1e1c19;
+  background: linear-gradient(135deg, rgba(30,28,25,0.8), rgba(39,36,32,0.8));
   border-radius: var(--radius);
   padding: 10px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(79, 133, 201, 0.15);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(79,133,201,0.1);
   border: 1px solid var(--border);
 }
 
@@ -70,8 +120,8 @@ h1 {
 }
 
 .cell {
-  width: clamp(40px, 10vw, 70px);
-  height: clamp(40px, 10vw, 70px);
+  width: clamp(40px, 10vw, 65px);
+  height: clamp(40px, 10vw, 65px);
   margin: 4px;
   border-radius: 50%;
   display: flex;
@@ -79,27 +129,27 @@ h1 {
   justify-content: center;
   cursor: pointer;
   background: #272420;
-  border: 2px solid rgba(79, 133, 201, 0.25);
+  border: 2px solid rgba(79,133,201,0.2);
   transition: background-color 0.25s, transform 0.15s, box-shadow 0.25s;
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
 }
 
 .cell[data-player="1"] {
   background: radial-gradient(circle at 35% 35%, #ff6b6b, #c0392b);
   border-color: #a93226;
-  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.4), 0 0 12px rgba(231, 76, 60, 0.5);
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.4), 0 0 16px rgba(231,76,60,0.4);
 }
 
 .cell[data-player="2"] {
   background: radial-gradient(circle at 35% 35%, #5dade2, #2980b9);
   border-color: #1f618d;
-  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.4), 0 0 12px rgba(52, 152, 219, 0.5);
+  box-shadow: inset 0 -3px 6px rgba(0,0,0,0.4), 0 0 16px rgba(52,152,219,0.4);
 }
 
 .cell.hover {
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255,255,255,0.12) !important;
   transform: scale(1.08);
-  box-shadow: 0 0 20px rgba(79, 133, 201, 0.4);
+  box-shadow: 0 0 20px rgba(79,133,201,0.3);
 }
 
 .cell.drop {
@@ -116,8 +166,8 @@ h1 {
 }
 
 @keyframes pulseGlow {
-  from { box-shadow: 0 0 15px rgba(244, 193, 67, 0.6); transform: scale(1); }
-  to { box-shadow: 0 0 30px rgba(244, 193, 67, 0.9); transform: scale(1.1); }
+  from { box-shadow: 0 0 15px rgba(244,193,67,0.6); transform: scale(1); }
+  to { box-shadow: 0 0 35px rgba(244,193,67,0.9); transform: scale(1.1); }
 }
 
 .btn-row {
@@ -128,8 +178,8 @@ h1 {
 }
 
 #reset-button {
-  padding: 12px 28px;
-  font-size: 1rem;
+  padding: 10px 28px;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   background: var(--surface);
@@ -138,7 +188,8 @@ h1 {
   border-radius: 50px;
   transition: all 0.2s;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 #reset-button:hover {
@@ -146,12 +197,36 @@ h1 {
   border-color: var(--green);
   color: var(--green);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(129, 182, 76, 0.3);
+  box-shadow: 0 4px 15px rgba(129,182,76,0.3);
+}
+
+#reset-button:active {
+  transform: translateY(0);
 }
 
 @media (max-width: 600px) {
-  .cell { width: 40px; height: 40px; margin: 2px; }
+  .game-wrapper { padding: 16px; border-radius: 20px; }
+  .cell { width: 38px; height: 38px; margin: 2px; }
   #game-board { padding: 6px; }
-  h1 { font-size: 1.8rem; }
-  #status { font-size: 1rem; padding: 10px 16px; }
+  h1 { font-size: 1.3rem; }
+  .subtitle { font-size: 0.8rem; }
+  #status { font-size: 0.85rem; padding: 8px 14px; min-width: 160px; }
+  #reset-button { font-size: 0.8rem; padding: 8px 20px; }
+  .back-link { display: none; }
+}
+
+@media (max-width: 400px) {
+  .game-wrapper { padding: 12px; border-radius: 16px; }
+  .cell { width: 32px; height: 32px; margin: 1.5px; }
+  #game-board { padding: 4px; }
+  h1 { font-size: 1.1rem; }
+  .subtitle { font-size: 0.7rem; margin-bottom: 12px; }
+  #status { font-size: 0.75rem; padding: 6px 12px; min-width: 120px; margin: 10px auto; }
+  #reset-button { font-size: 0.7rem; padding: 6px 16px; }
+  .btn-row { margin-top: 10px; }
+}
+
+@media (max-width: 360px) {
+  .cell { width: 28px; height: 28px; margin: 1px; }
+  #game-board { padding: 3px; }
 }

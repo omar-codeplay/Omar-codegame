@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قمة القلعة - Fortress Duel</title>
+    <title>قمة القلعة - Fortress Duel | Omar GamePlay</title>
     <link rel="stylesheet" href="fortress/fortress.css">
+    <link rel="icon" href="image/logo-nobg.png"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>🏰 قمة القلعة</h1>
-        <p>Fortress Duel - لعبة إستراتيجية جديدة</p>
+    <div class="game-wrapper">
+        <div class="top-bar">
+            <a href="index.html" class="back-link">← رجوع</a>
+            <h1>قمة القلعة</h1>
+            <span class="badge-duel">Fortress Duel</span>
+        </div>
 
         <div class="game-info">
             <span class="turn-indicator" id="turn-indicator">🔴 دور الأحمر</span>
@@ -18,11 +23,13 @@
         <div class="board" id="board"></div>
 
         <div class="winner-banner" id="winnerBanner" style="display:none">
-          <div class="winner-text" id="winnerText">🏆 الفائز هو الأحمر!</div>
-          <button class="btn-small" onclick="window.game.resetGame()">⟳ لعب مرة أخرى</button>
+            <div class="winner-text" id="winnerText">🏆 الفائز هو الأحمر!</div>
+            <button class="btn-small" onclick="window.game.resetGame()">⟳ لعب مرة أخرى</button>
         </div>
 
-        <button id="reset-btn" class="btn-large">إعادة اللعبة - Reset</button>
+        <div class="btn-row">
+            <button id="reset-btn" class="btn-large">⟳ إعادة اللعبة</button>
+        </div>
     </div>
 
     <script src="fortress/fortress.js"></script>

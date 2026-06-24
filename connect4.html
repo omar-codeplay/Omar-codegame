@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connect Four</title>
+    <title>Connect Four | Omar GamePlay</title>
     <link rel="icon" href="image/logo-nobg.png"/>
     <link rel="stylesheet" href="connect4/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Connect Four</h1>
-    <p class="subtitle">Drop discs — get 4 in a row to win!</p>
-    <div id="game-board"></div>
-    <div id="status">Player 1's turn</div>
-    <div class="btn-row">
-      <button id="reset-button">↻ New Game</button>
+    <div class="game-wrapper">
+        <div class="top-bar">
+            <a href="index.html" class="back-link">← Back</a>
+            <h1>Connect Four</h1>
+            <div></div>
+        </div>
+        <p class="subtitle">Drop discs — get 4 in a row to win!</p>
+        <div id="game-board"></div>
+        <div id="status">Player 1's turn</div>
+        <div class="btn-row">
+            <button id="reset-button">New Game</button>
+        </div>
     </div>
     <script src="connect4/script.js"></script>
 </body>

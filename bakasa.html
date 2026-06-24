@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>بكاسه</title>
+    <title>بكاسه - Spy Game | Omar GamePlay</title>
     <link rel="stylesheet" href="bakasa/style.css">
+    <link rel="icon" href="image/logo-nobg.png"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
-
 <body>
-    <div class="container">
-        <h1>🕵️ بكاسه 🕵️</h1>
-        <p>لعبة الجاسوس - The Spy Game</p>
+    <div class="game-wrapper">
+        <div class="top-bar">
+            <a href="index.html" class="back-link">← رجوع</a>
+            <h1>بكاسه</h1>
+            <span class="badge-spy">Spy Game</span>
+        </div>
 
         <!-- Screen 1: Player Names Entry -->
         <div id="names-screen" class="screen active">
             <div class="names-content">
                 <h2>أدخل أسماء اللاعبين</h2>
-                <p>Enter Player Names</p>
                 <div id="players-list" class="players-list"></div>
                 <div class="input-section">
-                    <input type="text" id="player-name-input" placeholder="اسم اللاعب - Player Name">
-                    <button id="add-player-btn" class="btn-medium">إضافة - Add</button>
+                    <input type="text" id="player-name-input" placeholder="اسم اللاعب">
+                    <button id="add-player-btn" class="btn-medium">إضافة</button>
                 </div>
-                <button id="names-done-btn" class="btn-large" disabled>التالي - Next</button>
+                <button id="names-done-btn" class="btn-large" disabled>التالي</button>
             </div>
         </div>
 
-        <!-- Screen 2: Game Setup (Category & Spies) -->
+        <!-- Screen 2: Game Setup -->
         <div id="setup-screen" class="screen">
             <div class="setup-content">
                 <h2>إعدادات اللعبة</h2>
 
                 <div class="setup-section">
-                    <label>الفئة (Category):</label>
+                    <label>الفئة</label>
                     <div class="category-grid">
                         <button class="category-btn" data-category="food">🍲 أكل</button>
                         <button class="category-btn" data-category="animals">🦁 حيوانات</button>
@@ -44,40 +46,40 @@
                 </div>
 
                 <div class="setup-section">
-                    <label for="impostors-count">عدد الجواسيس (Number of Imposters):</label>
+                    <label>عدد الجواسيس</label>
                     <div class="number-control">
                         <button id="impostors-minus" class="btn-small">−</button>
                         <input type="number" id="impostors-count" value="1" min="1" max="10">
                         <button id="impostors-plus" class="btn-small">+</button>
-                        <button id="impostors-random" class="btn-small" style="margin-right: 10px;">🎲 عشوائي</button>
+                        <button id="impostors-random" class="btn-small btn-random">🎲</button>
                     </div>
                 </div>
 
-                <button id="game-start-btn" class="btn-large">ابدأ اللعبة - Start Game</button>
+                <button id="game-start-btn" class="btn-large btn-start">ابدأ اللعبة</button>
             </div>
         </div>
 
-        <!-- Screen 3: Card Reveal (Private View) -->
+        <!-- Screen 3: Card Reveal -->
         <div id="card-reveal-screen" class="screen">
             <div class="card-reveal-content">
                 <h2 id="card-label"></h2>
                 <p id="player-turn-text"></p>
                 <div id="card-display" class="card-display">
-                    <div class="card">
+                    <div class="card" id="card-el">
                         <div class="card-inner" id="card-inner">
                             <div class="card-front">
-                                <p>اقلب الهاتف</p>
-                                <!-- removed English line -->
+                                <span class="card-front-icon">🃏</span>
+                                <span>اضغط للكشف</span>
                             </div>
-                            <div class="card-back" id="card-content">
+                            <div class="card-back">
                                 <div id="role-display"></div>
                                 <div id="word-display"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button id="card-reveal-btn" class="btn-large">اقلب - Reveal Card</button>
-                <button id="card-next-btn" class="btn-large hidden">التالي - Next Player</button>
+                <button id="card-reveal-btn" class="btn-large btn-reveal">اكشف البطاقة</button>
+                <button id="card-next-btn" class="btn-large hidden">التالي</button>
             </div>
         </div>
 
@@ -85,12 +87,12 @@
         <div id="discussion-screen" class="screen">
             <div class="discussion-content">
                 <h2>جولة النقاش</h2>
-                <p>Discussion Phase - اسأل بعضكم على بعض</p>
+                <p class="phase-subtitle">سؤال وجواب - اكتشف الجاسوس!</p>
                 <div class="discussion-info">
                     <p class="round-info" id="round-text"></p>
                 </div>
                 <div class="speech-bubble-area" id="speech-bubbles"></div>
-                <button id="ready-to-vote-btn" class="btn-large">جاهز للتصويت - Ready to Vote</button>
+                <button id="ready-to-vote-btn" class="btn-large">جاهز للتصويت</button>
             </div>
         </div>
 
@@ -100,9 +102,9 @@
                 <h2>من هو الجاسوس؟</h2>
                 <p id="current-voter-text"></p>
                 <div class="voting-options" id="voting-options"></div>
-                <p id="vote-feedback" style="min-height: 30px; margin: 10px 0;"></p>
-                <button id="voting-next-btn" class="btn-large hidden">التالي - Next Voter</button>
-                <button id="voting-end-btn" class="btn-large hidden">انهاء التصويت - End Voting</button>
+                <p id="vote-feedback"></p>
+                <button id="voting-next-btn" class="btn-large hidden">التالي</button>
+                <button id="voting-end-btn" class="btn-large hidden">إنهاء التصويت</button>
             </div>
         </div>
 
@@ -110,7 +112,7 @@
         <div id="guess-screen" class="screen">
             <div class="guess-content">
                 <h2 id="guess-title"></h2>
-                <p>خمّن من 4 خيارات</p>
+                <p class="phase-subtitle">خمّن من 4 خيارات</p>
                 <div class="guess-options" id="guess-options"></div>
             </div>
         </div>
@@ -121,8 +123,8 @@
                 <h2 id="game-result-title"></h2>
                 <div class="results-details" id="results-details"></div>
                 <div class="result-buttons">
-                    <button id="new-round-btn" class="btn-large">جولة جديدة - New Round</button>
-                    <button id="play-again-btn" class="btn-large">لعبة جديدة - New Game</button>
+                    <button id="new-round-btn" class="btn-large">جولة جديدة</button>
+                    <button id="play-again-btn" class="btn-large">لعبة جديدة</button>
                 </div>
             </div>
         </div>
@@ -130,5 +132,4 @@
 
     <script src="bakasa/script.js"></script>
 </body>
-
 </html>
