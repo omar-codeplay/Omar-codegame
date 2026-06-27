@@ -12,7 +12,7 @@ const statusDiv = document.getElementById('status');
 const resetButton = document.getElementById('reset-button');
 
 // audio context for generating simple tones
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioCtx;
 
 resetButton.addEventListener('click', resetGame);
 
@@ -158,6 +158,12 @@ function switchPlayer() {
 // sound helpers using Web Audio API
 // -----------------------------------------------------------------------------
 function playTone(frequency, duration = 0.1, type = 'sine') {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
     const oscillator = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     oscillator.type = type;
