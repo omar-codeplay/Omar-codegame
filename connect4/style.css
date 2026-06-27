@@ -106,8 +106,10 @@ h1 {
 }
 
 #game-board {
-  display: inline-block;
+  display: block;
   margin: 10px auto;
+  max-width: 520px;
+  width: 100%;
   background: linear-gradient(135deg, rgba(30,28,25,0.8), rgba(39,36,32,0.8));
   border-radius: var(--radius);
   padding: 10px;
@@ -117,12 +119,16 @@ h1 {
 
 .row {
   display: flex;
+  gap: 4px;
+  justify-content: center;
 }
 
 .cell {
-  width: clamp(40px, 10vw, 65px);
-  height: clamp(40px, 10vw, 65px);
-  margin: 4px;
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: 1;
+  max-width: 65px;
+  max-height: 65px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -204,10 +210,10 @@ h1 {
   transform: translateY(0);
 }
 
-@media (max-width: 600px) {
-  .game-wrapper { padding: 16px; border-radius: 20px; }
-  .cell { width: 38px; height: 38px; margin: 2px; }
-  #game-board { padding: 6px; }
+@media (max-width: 640px) {
+  .game-wrapper { padding: 20px; border-radius: 20px; }
+  .cell { max-width: 55px; max-height: 55px; }
+  #game-board { padding: 8px; }
   h1 { font-size: 1.3rem; }
   .subtitle { font-size: 0.8rem; }
   #status { font-size: 0.85rem; padding: 8px 14px; min-width: 160px; }
@@ -215,18 +221,24 @@ h1 {
   .back-link { display: none; }
 }
 
-@media (max-width: 400px) {
-  .game-wrapper { padding: 12px; border-radius: 16px; }
-  .cell { width: 32px; height: 32px; margin: 1.5px; }
-  #game-board { padding: 4px; }
-  h1 { font-size: 1.1rem; }
-  .subtitle { font-size: 0.7rem; margin-bottom: 12px; }
-  #status { font-size: 0.75rem; padding: 6px 12px; min-width: 120px; margin: 10px auto; }
-  #reset-button { font-size: 0.7rem; padding: 6px 16px; }
-  .btn-row { margin-top: 10px; }
+@media (max-width: 480px) {
+  .game-wrapper { padding: 14px; border-radius: 16px; }
+  .cell { max-width: 45px; max-height: 45px; }
+  #game-board { padding: 6px; }
+  .row { gap: 3px; }
+  h1 { font-size: 1.2rem; }
+  .subtitle { font-size: 0.75rem; }
+  #status { font-size: 0.8rem; padding: 6px 12px; min-width: 120px; }
+  #reset-button { font-size: 0.75rem; padding: 6px 16px; }
 }
 
-@media (max-width: 360px) {
-  .cell { width: 28px; height: 28px; margin: 1px; }
-  #game-board { padding: 3px; }
+@media (max-width: 380px) {
+  .game-wrapper { padding: 10px; border-radius: 14px; }
+  .cell { max-width: 38px; max-height: 38px; }
+  #game-board { padding: 4px; }
+  .row { gap: 2px; }
+  h1 { font-size: 1rem; }
+  .subtitle { font-size: 0.65rem; }
+  #status { font-size: 0.7rem; padding: 5px 10px; min-width: 100px; }
+  #reset-button { font-size: 0.65rem; padding: 5px 12px; }
 }

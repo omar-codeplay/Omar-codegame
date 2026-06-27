@@ -10,8 +10,10 @@
     <meta property="og:title" content="GamePlay Arena - ألعاب ثنائية مجانية">
     <meta property="og:description" content="10 ألعاب ممتعة: شطرنج، كونكت 4، بكاسه، سودوكو، فورتريس وأكثر. العب مجاناً.">
     <meta property="og:image" content="https://omar-gameplay.netlify.app/image/og-preview.jpg">
+    <link rel="icon" href="image/logo-nobg.webp" type="image/webp" />
     <link rel="icon" href="image/logo-nobg.png" />
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3758016323496227" crossorigin="anonymous"></script>
+    <script>window.adsbygoogle=window.adsbygoogle||[];</script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3758016323496227" crossorigin="anonymous" onerror="this.dataset.failed='1'"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -129,7 +131,7 @@
         }
 
         .subtitle {
-            color: #8a8278;
+            color: #b5a99a;
             font-size: 1.05rem;
             font-weight: 400;
         }
@@ -267,21 +269,22 @@
         .button.bakasa .card-glow { background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(102,126,234,0.15), transparent 60%); }
         .button.fortress .card-glow { background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), rgba(231,76,60,0.15), transparent 60%); }
 
-        .button.xo { background-image: url('image/X_O.png'); }
-        .button.chess { background-image: url('image/chess.png'); }
-        .button.connect4 { background-image: url('image/connect4.png'); }
-        .button.memory { background-image: url('image/cards.png'); }
-        .button.crossroad { background-image: url('image/crossroad.png'); }
-        .button.coloriq { background-image: url('image/colors.png'); }
-        .button.bakasa { background-image: url('image/bakasa.png'); }
-        .button.fortress { background-image: url('image/fortress.png'); }
+        .button.xo { background-image: -webkit-image-set(url('image/X_O.webp') type('image/webp') 1x, url('image/X_O.png') type('image/png') 1x); background-image: image-set(url('image/X_O.webp') type('image/webp') 1x, url('image/X_O.png') type('image/png') 1x); }
+        .button.chess { background-image: -webkit-image-set(url('image/chess.webp') type('image/webp') 1x, url('image/chess.png') type('image/png') 1x); background-image: image-set(url('image/chess.webp') type('image/webp') 1x, url('image/chess.png') type('image/png') 1x); }
+        .button.connect4 { background-image: -webkit-image-set(url('image/connect4.webp') type('image/webp') 1x, url('image/connect4.png') type('image/png') 1x); background-image: image-set(url('image/connect4.webp') type('image/webp') 1x, url('image/connect4.png') type('image/png') 1x); }
+        .button.memory { background-image: -webkit-image-set(url('image/cards.webp') type('image/webp') 1x, url('image/cards.png') type('image/png') 1x); background-image: image-set(url('image/cards.webp') type('image/webp') 1x, url('image/cards.png') type('image/png') 1x); }
+        .button.crossroad { background-image: -webkit-image-set(url('image/crossroad.webp') type('image/webp') 1x, url('image/crossroad.png') type('image/png') 1x); background-image: image-set(url('image/crossroad.webp') type('image/webp') 1x, url('image/crossroad.png') type('image/png') 1x); }
+        .button.coloriq { background-image: -webkit-image-set(url('image/colors.webp') type('image/webp') 1x, url('image/colors.png') type('image/png') 1x); background-image: image-set(url('image/colors.webp') type('image/webp') 1x, url('image/colors.png') type('image/png') 1x); }
+        .button.bakasa { background-image: -webkit-image-set(url('image/bakasa.webp') type('image/webp') 1x, url('image/bakasa.png') type('image/png') 1x); background-image: image-set(url('image/bakasa.webp') type('image/webp') 1x, url('image/bakasa.png') type('image/png') 1x); }
+        .button.fortress { background-image: -webkit-image-set(url('image/fortress.webp') type('image/webp') 1x, url('image/fortress.png') type('image/png') 1x); background-image: image-set(url('image/fortress.webp') type('image/webp') 1x, url('image/fortress.png') type('image/png') 1x); }
+        .button.sudoku { background-image: -webkit-image-set(url('image/IQ.webp') type('image/webp') 1x, url('image/IQ.png') type('image/png') 1x); background-image: image-set(url('image/IQ.webp') type('image/webp') 1x, url('image/IQ.png') type('image/png') 1x); }
 
         footer {
             position: relative;
             z-index: 1;
             margin-top: 30px;
             text-align: center;
-            color: #5a5550;
+            color: #7d7570;
             font-size: 0.85rem;
             animation: containerIn 0.8s ease-out 0.5s backwards;
         }
@@ -329,7 +332,7 @@
     </style>
 </head>
 <body>
-    <div class="particles">
+    <div class="particles" aria-hidden="true">
         <div class="particle"></div>
         <div class="particle"></div>
         <div class="particle"></div>
@@ -340,74 +343,76 @@
         <div class="particle"></div>
     </div>
 
-    <div class="container">
+    <main class="container">
         <div class="header-section">
             <div class="logo-icon">G</div>
             <h1>GamePlay Arena</h1>
             <p class="subtitle">اختر لعبتك واستمتع مع الأصدقاء</p>
         </div>
         <div class="button-container">
-            <a href="Chess.html" class="button chess" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')">
+            <a href="Chess.html" class="button chess">
                 <span>Chess</span>
                 <span class="card-sub">شطرنج احترافي</span>
                 <span class="card-glow"></span>
             </a>
-            <a href="connect4.html" class="button connect4" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')">
+            <a href="connect4.html" class="button connect4">
                 <span>Connect 4</span>
                 <span class="card-sub">أربعة في صف</span>
                 <span class="card-glow"></span>
             </a>
-            <a href="memory.html" class="button memory" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')">
+            <a href="memory.html" class="button memory">
                 <span>Memory</span>
                 <span class="card-sub">لعبة الذاكرة</span>
                 <span class="card-glow"></span>
             </a>
-            <a href="crossroad.html" class="button crossroad" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')">
+            <a href="crossroad.html" class="button crossroad">
                 <span>Crossroad</span>
                 <span class="card-sub">عبور الطريق</span>
                 <span class="card-glow"></span>
             </a>
-            <a href="coloriq.html" class="button coloriq" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')">
+            <a href="coloriq.html" class="button coloriq">
                 <span>IQ Test</span>
                 <span class="card-sub">اختبار الذكاء</span>
                 <span class="card-glow"></span>
             </a>
-            <a href="bakasa.html" class="button bakasa" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')">
+            <a href="bakasa.html" class="button bakasa">
                 <span>بكاسه</span>
                 <span class="card-sub">لعبة الجاسوس</span>
                 <span class="card-glow"></span>
             </a>
-            <a href="fortress.html" class="button fortress" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')">
+            <a href="fortress.html" class="button fortress">
                 <span>Fortress</span>
                 <span class="card-sub">قمة القلعة</span>
                 <span class="card-glow"></span>
             </a>
-            <a href="sudoku.html" class="button sudoku" onmousemove="this.style.setProperty('--mx', (event.offsetX / this.offsetWidth * 100) + '%'); this.style.setProperty('--my', (event.offsetY / this.offsetHeight * 100) + '%')" style="background-image:url('image/IQ.png')">
+            <a href="sudoku.html" class="button sudoku">
                 <span>Sudoku</span>
                 <span class="card-sub">سودوكو</span>
                 <span class="card-glow"></span>
             </a>
         </div>
-    </div>
+    </main>
     <footer>
         <a href="https://omar-codeplay.netlify.app/" target="_blank">omar-codeplay.netlify.app</a>
         <span class="divider">|</span>
         <span>&copy; 2026 Omar CodePlay</span>
     </footer>
 
-    <script>
+    <script defer>
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js');
         }
 
         document.querySelectorAll('.button').forEach(btn => {
+            let rafId;
             btn.addEventListener('mousemove', e => {
-                const rect = btn.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-                btn.style.setProperty('--mx', x + '%');
-                btn.style.setProperty('--my', y + '%');
-            });
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(() => {
+                    const rect = btn.getBoundingClientRect();
+                    btn.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+                    btn.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
+                });
+            }, { passive: true });
         });
     </script>
 </body>
