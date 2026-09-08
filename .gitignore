@@ -1,1 +1,1 @@
-(minesweeper/index.html is just an HTML file, which is source code, so no need to ignore)
+Nothing should be ignored based on the provided file changes. The deletion of `minesweeper/index.html` is a source file that doesn't require any ignore rules.
