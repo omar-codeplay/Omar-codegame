@@ -1,14 +1,14 @@
 :root {
-  --bg: #040303;
-  --surface: #1e1c19;
-  --surface2: #272420;
-  --border: #3a3835;
-  --green: #81b64c;
-  --blue: #4f85c9;
-  --yellow: #f4c143;
+  --bg: #0a0e17;
+  --surface: #0f172a;
+  --surface2: #1e293b;
+  --border: #334155;
+  --green: #3b82f6;
+  --blue: #2563eb;
+  --yellow: #fbbf24;
   --red: #c0392b;
   --text: #e8e4dc;
-  --text2: #8a8278;
+  --text2: #94a3b8;
   --radius: 10px;
 }
 

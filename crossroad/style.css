@@ -4,7 +4,7 @@ body {
   margin: 0;
   font-family: "Press Start 2P", monospace;
   font-size: 2em;
-  background: #040303;
+  background: #0a0e17;
   color: #e8e4dc;
   overflow: hidden;
   user-select: none;
@@ -39,19 +39,19 @@ button {
 
 .score-label {
   font-size: 0.35em;
-  color: #8a8278;
+  color: #94a3b8;
   letter-spacing: 3px;
 }
 
 #counter {
   font-size: 1.2em;
-  color: #f4c143;
+  color: #fbbf24;
   text-shadow: 0 0 20px rgba(244,193,67,0.4);
 }
 
 .back-home {
   pointer-events: auto;
-  color: #8a8278;
+  color: #94a3b8;
   text-decoration: none;
   font-size: 0.5em;
   padding: 8px 12px;
@@ -64,9 +64,9 @@ button {
 }
 
 .back-home:hover {
-  color: #81b64c;
-  border-color: #81b64c;
-  background: rgba(129,182,76,0.1);
+  color: #3b82f6;
+  border-color: #3b82f6;
+  background: rgba(59,130,246,0.1);
 }
 
 #end {
@@ -103,12 +103,12 @@ button {
 
 .final-score {
   font-size: 0.5em;
-  color: #8a8278;
+  color: #94a3b8;
   margin-bottom: 24px;
 }
 
 .final-score span {
-  color: #f4c143;
+  color: #fbbf24;
   font-size: 1.2em;
 }
 
@@ -126,10 +126,10 @@ button {
 
 #end button:hover {
   background: #3a3835;
-  border-color: #81b64c;
-  color: #81b64c;
+  border-color: #3b82f6;
+  color: #3b82f6;
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(129,182,76,0.2);
+  box-shadow: 0 4px 20px rgba(59,130,246,0.2);
 }
 
 #controlls {
@@ -161,7 +161,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8a8278;
+  color: #94a3b8;
   font-size: 1rem;
   transition: all 0.15s;
 }
@@ -169,12 +169,12 @@ button {
 #controlls button:hover {
   background: rgba(58,56,53,0.8);
   color: #e8e4dc;
-  border-color: #81b64c;
+  border-color: #3b82f6;
 }
 
 #controlls button:active {
   transform: scale(0.92);
-  background: rgba(129,182,76,0.2);
+  background: rgba(59,130,246,0.2);
 }
 
 #controlls button:first-of-type {
